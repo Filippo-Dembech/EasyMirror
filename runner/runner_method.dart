@@ -1,4 +1,3 @@
-
 library runner;
 
 import 'dart:mirrors';
@@ -8,9 +7,11 @@ import '../utils.dart';
 import 'annotations/helper.dart';
 import 'annotations/run.dart';
 
-
 // TODO: encapsulate this class only inside the runner library
-class RunnerMethod {
+
+// ? Since we can't hide this class to the other packages it might
+// ? as well make it un-inheritable with the `final` keyword.
+final class RunnerMethod {
   /// ---
   /// The `MethodMirror` instance associated with the current
   /// `_RunnerMethod` instance.
@@ -67,19 +68,19 @@ class RunnerMethod {
         hasNoParameters = methodMirror.parameters.isEmpty,
         isNotPrivate = !methodMirror.isPrivate,
         containsHelper =
-        getMethodName(methodMirror).toLowerCase().contains("helper"),
+            getMethodName(methodMirror).toLowerCase().contains("helper"),
         hasHelperAnnotation = methodMirror.metadata
             .where((metadata) => metadata.reflectee.runtimeType == helper)
             .isNotEmpty,
         hasHelperRunAnnotation = methodMirror.metadata
-            .where((metadata) => metadata.reflectee.runtimeType == helper)
-            .isNotEmpty &&
+                .where((metadata) => metadata.reflectee.runtimeType == helper)
+                .isNotEmpty &&
             methodMirror.metadata
-                .where(
-                    (metadata) => metadata.reflectee.runtimeType == helper)
-                .toList()[0]
-                .getField(#run)
-                .reflectee ==
+                    .where(
+                        (metadata) => metadata.reflectee.runtimeType == helper)
+                    .toList()[0]
+                    .getField(#run)
+                    .reflectee ==
                 true,
         hasRunAnnotation = methodMirror.metadata
             .where((metadata) => metadata.reflectee.runtimeType == run)
