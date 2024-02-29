@@ -94,8 +94,14 @@ String strMagenta(String s) =>   "\x1B[35m$s\x1B[0m";
 String strCyan(String s) =>   "\x1B[36m$s\x1B[0m";
 String strWhite(String s) =>   "\x1B[37m$s\x1B[0m";
 
-
+/// ---
+/// A simple annotation for testing purposes only.
+/// It has a [message] property with which reflection
+/// with parameterized annotation can be practiced.
 class annotation {
+  /// ---
+  /// Optional parameters message passed to the `annotation`
+  /// annotation, it is an empty `String` by defaut.
   final String message;
   const annotation([this.message = ""]);
 }
