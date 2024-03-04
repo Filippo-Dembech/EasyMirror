@@ -4,6 +4,7 @@ import '../PositionalParametersRequiredException.dart';
 
 class MethodAnalyzer {
 
+  // TODO: make 'method' private
   final MethodMirror method;
 
   MethodAnalyzer(this.method) {
@@ -11,28 +12,25 @@ class MethodAnalyzer {
   }
 
   String get name => MirrorSystem.getName(method.simpleName);
+  String get source => method.source!;
 
   List<ParameterMirror> get parametersMirrors => method.parameters;
 
   String get parametersString {
-    int methodNameIndexStart = method.source!.indexOf(name + "(");
-    int methodParametersStart = methodNameIndexStart + name.length;
-    int openParentheses = 0;
-    int closedParentheses = 0;
+    int methodNameIndex = source.indexOf(name + "(");
+    int methodParametersStart = methodNameIndex + name.length;
     int methodParametersEnd = 0;
-    for (int i = methodParametersStart; i < method.source!.length; i++) {
-      if (method.source![i] == "(") {
-        openParentheses++;
-      }
-      if (method.source![i] == ")") {
-        closedParentheses++;
-      }
-      if (openParentheses == closedParentheses) {
+    int openParenthesesAmount = 0;
+    int closedParenthesesAmount = 0;
+    for (int i = methodParametersStart; i < source.length; i++) {
+      if (source[i].isEqualTo("(")) openParenthesesAmount++;
+      if (source[i].isEqualTo(")")) closedParenthesesAmount++;
+      if (openParenthesesAmount == closedParenthesesAmount) {
         methodParametersEnd = i + 1;
         break;
       }
     }
-    return method.source!.substring(methodParametersStart, methodParametersEnd).replaceAll(" ", "");
+    return source.substring(methodParametersStart, methodParametersEnd).withoutWhiteSpaces();
   }
 
   List<String> get parametersList => [
@@ -119,6 +117,11 @@ class MethodAnalyzer {
 }
 
 
+
+extension on String {
+  bool isEqualTo(String str) => this == str;
+  String withoutWhiteSpaces() => this.replaceAll(" ", "");
+}
 
 
 
