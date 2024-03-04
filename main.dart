@@ -1,29 +1,70 @@
+import 'dart:mirrors';
+
+import 'logger/logger_test.dart';
 import 'runner/runner.dart';
+import 'running_manager.dart';
 
-class Test extends Runner {
+class test {
+  const test();
+}
 
-  void firstMethod() => print("should run");
-  void secondMethod(String n) => print("shouldn't run");
-  String thirdMethod() { print("should run"); return ""; }
-  void helperMethod() => print("shouldn't run");
-  void methodHelper() => print("shouldn't run");
-  void thirdHelperMethod() => print("shouldn't run");
+class Person {
+  String _name;
+  static int peopleAmount = 0;
 
-  @run()
-  void firstHelper() => print("should run");
+  static int enrollPerson() => ++peopleAmount;
 
-  void fourthMethod() => print("shouldn't run");
+  static int expelPerson() => --peopleAmount;
 
-  @run()
-  @helper()
-  void fifthMethod() => print("should run");
+  Person([this._name = "john doe"]);
 
-  @helper(run: true)
-  void sixthMethod() => print("should run");
+  Person.eric() : _name = "eric";
+
+  void get name => _name;
+
+  @test()
+  String scream(String sth) => sth.toUpperCase();
+
+  void sayHello() {
+    print("hello from person");
+  }
+}
+
+class Test {
+  void firstTest() {}
+
+  String secondTest() => "second Test";
+
+  int thirdTest(int a, int b) => a + b;
+
+  String fourthTest({required String name, required int age}) =>
+      "Happy birthday $name, you are $age";
+
+  String fifthTest(String firstName, int age, {required String lastName}) =>
+      "Happy birthday $firstName $lastName, you are $age";
 
 
 }
 
 void main() {
-  Test();
+
+
+  final a = RunningManager(Test());
+
+  a.simpleGeneralRun(
+    positionals: {
+      #thirdTest: [3, 8],
+      #fifthTest: ["Princess", 40]
+    },
+    named: {
+      #fourthTest: {
+        #name: "Princess Caoline",
+        #age: 32
+      },
+      #fifthTest: {
+        #lastName: "Caroline",
+      }
+    },
+
+  );
 }
