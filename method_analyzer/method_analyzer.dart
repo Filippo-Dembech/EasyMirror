@@ -2,6 +2,7 @@ import 'dart:mirrors';
 
 import '../ConstructorException.dart';
 import '../PositionalParametersRequiredException.dart';
+import 'parameter_extractor.dart';
 
 enum ParameterType {
 
@@ -50,30 +51,19 @@ class MethodAnalyzer {
   late String _parametersString;
   late List<ParameterMirror> _parametersMirrors;
 
+  int getParametersStartingIndexIn(String source) {
+    int methodNameIndex = source.indexOf(name + "(");
+    return methodNameIndex + name.length;
+  }
+
   MethodAnalyzer(this.method) {
     if (method.isConstructor) throw ConstructorException();
 
-    // ! compute here parametersString because it is used in other methods and computing
-    // ! it every single time slows execution down
-    int methodNameIndex = source.indexOf(name + "(");
-    int methodParametersStart = methodNameIndex + name.length;
-    int methodParametersEnd = 0;
-    int openParenthesesAmount = 0;
-    int closedParenthesesAmount = 0;
-    for (int i = methodParametersStart; i < source.length; i++) {
-      if (source.at(i).isEqualTo("(")) openParenthesesAmount++;
-      if (source.at(i).isEqualTo(")")) closedParenthesesAmount++;
-      if (openParenthesesAmount == closedParenthesesAmount) {
-        methodParametersEnd = i + 1;
-        break;
-      }
-    }
-
-    // ! withoutWhiteSpaces() because it makes it easier to use string patterns throughout
-    // ! the entire codebase without the worry to consider them.
-    _parametersString = source
-        .substring(methodParametersStart, methodParametersEnd)
-        .withoutWhiteSpaces();
+    // ! '_parametersString' is computed here because it is
+    // ! used in other methods and computing it every single
+    // ! time slows execution down
+    ParametersExtractor parametersExtractor = ParametersExtractor(source, name);
+    _parametersString = parametersExtractor.parameters;
 
     _parametersMirrors = method.parameters;
   }
