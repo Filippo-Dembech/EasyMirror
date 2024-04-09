@@ -2,6 +2,9 @@ import 'dart:mirrors';
 
 import '../ConstructorException.dart';
 import '../PositionalParametersRequiredException.dart';
+import 'Extensions/list__empty_string_remover.dart';
+import 'Extensions/object__equal_objects.dart';
+import 'Extensions/string__element_fetcher.dart';
 import 'parameter_extractor.dart';
 
 enum ParameterType {
@@ -318,19 +321,4 @@ class MethodAnalyzer {
 
     return result;
   }
-}
-
-// helping extension methods
-extension on String {
-  String at(int i) => this[i];
-
-  String withoutWhiteSpaces() => this.replaceAll(" ", "");
-}
-
-extension on Object {
-  bool isEqualTo(Object o) => this == o && this.runtimeType == o.runtimeType;
-}
-
-extension on List<String> {
-  List<String> withoutEmptyStrings() => this.where((str) => str != "").toList();
 }
