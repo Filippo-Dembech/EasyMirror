@@ -6,17 +6,8 @@ import 'Extensions/list__empty_string_remover.dart';
 import 'Extensions/object__equal_objects.dart';
 import 'Extensions/string__element_fetcher.dart';
 import 'parameter_extractor.dart';
+import 'parameter_type.dart';
 
-enum ParameterType {
-
-  positional("POSITIONAL"),
-  optionalPositional("OPTIONAL_POSITIONAL"),
-  named("NAMED");
-
-  final String value;
-
-  const ParameterType(this.value);
-}
 
 class Parameter {
   final String name;
