@@ -100,6 +100,9 @@ class Test {
   void F({required int a, required int b, required int c}) {}
   void G({int a = 2}) {}
   void H([int a = 2, int b = 3, int? c]) {}
+  // ! BUG REPORT: 'isNullable: false' this is an error
+  // ! BUG REPORT: 'defaultValue: [ = const[]]' const shouldn't be there
+  void I({List<String>? names = const []}) {}
 
 }
 
@@ -117,7 +120,7 @@ void main() {
   a.type.declarations.forEach((symbol, declaration) {
     if (declaration is MethodMirror && !declaration.isConstructor) {
       final method = MethodAnalyzer(declaration);
-      print("======" + method.name + "======");
+      print("======" + method.methodName + "======");
       print("${method.parametersReport}");
       // print("parameters declaration: ${method.parametersDeclaration}");
       // print(method.positionalParameters);
