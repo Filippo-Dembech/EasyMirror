@@ -6,6 +6,6 @@ import 'string_extractor.dart';
 
 void main() {
   String testingString = "<(hi) there [<were are] you?>>>";
-  var extractor = StringExtractor.of(testingString);
+  var extractor = StringExtractor.parsing(testingString);
   print(extractor.extract());
 }

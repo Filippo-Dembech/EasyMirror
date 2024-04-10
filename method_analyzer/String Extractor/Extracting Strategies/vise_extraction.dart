@@ -1,7 +1,21 @@
 import '../delimiters.dart';
-import '../string_extractor.dart';
 import 'extraction.dart';
 
+/// When [ViseExtraction] is used by
+/// [StringExtractor] the delimiting area is defined
+/// as the area between the first occurrence of the
+/// first opening delimiter and the last occurrence
+/// of the closing delimiter.
+/// ---
+/// Example:
+/// Assuming that the delimiters are rounded brackets...
+/// ```dart
+/// "Hi (there)"  // returns -> "there"
+/// "((Hi)) there" // returns -> "(Hi)"
+/// "((Hi) there)" // returns -> "(Hi) There"
+/// "(Hi) (there)" // returns -> "Hi) (there"
+/// "((Hi there" // returns -> ""
+/// ```
 final class ViseExtraction extends Extraction {
   const ViseExtraction();
 
