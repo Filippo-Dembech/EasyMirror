@@ -4,6 +4,8 @@ import 'ConstructorException.dart';
 import 'Extensions/list__empty_string_remover.dart';
 import 'Extensions/object__equal_objects.dart';
 import 'Extensions/string__element_fetcher.dart';
+import 'String Extractor/delimiters.dart';
+import 'String Extractor/string_extractor.dart';
 import 'parameter.dart';
 import 'parameter_extractor.dart';
 import 'parameter_type.dart';
@@ -94,41 +96,59 @@ class MethodAnalyzer {
 
 
   List<String> _optionalPositionalParameters() =>
-      _getParametersEnclosedIn("[", "]")
+      //_getParametersEnclosedIn("[", "]")
+          _getParametersEnclosedIn(Delimiters.SQUARED_BRACKETS)
           .map((parameter) => "OptionalPositional::$parameter")
           .toList();
 
 
   List<String> _namedParameters() =>
-      _getParametersEnclosedIn("{", "}")
+      //_getParametersEnclosedIn("{", "}")
+      _getParametersEnclosedIn(Delimiters.CURLY_BRACKETS)
       .map((parameter) => "Named::$parameter")
       .toList();
 
 
   List<String> _getParametersEnclosedIn(
-      String openingDelimiter,
-      String closingDelimiter,
+      Delimiters delimiters
       ) {
-    int openingDelimitersAmount = 0;
-    int closingDelimitersAmount = 0;
+    String parameters = StringExtractor.parsing(parametersDeclaration).within(delimiters).extract();
+    print("EXTRACTED PARAMETERS WITHIN $delimiters -> $parameters");
+    return _splitParameters(parameters).withoutEmptyStrings();
+  }
+
+// ! parameters list must be without opening "(" and closing ")"
+  List<String> _splitParameters(String text) {
+    List<String> result = [];
+
+    int openingParenthesis = 0;
+    int closingParenthesis = 0;
+
+    int openingAngleBrackets = 0;
+    int closingAngleBrackets = 0;
+
     int splitStart = 0;
-    for (int i = 0; i < parametersDeclaration.length; i++) {
-      if (parametersDeclaration.at(i).isEqualTo(openingDelimiter))
-        openingDelimitersAmount++;
-      if (parametersDeclaration.at(i).isEqualTo(closingDelimiter))
-        closingDelimitersAmount++;
 
-      // if it is the first opening delimiter met, save the starting index
-      if (parametersDeclaration.at(i).isEqualTo(openingDelimiter) &&
-          splitStart.isEqualTo(0)) splitStart = i + 1;
+    for (int i = 0; i < text.length; i++) {
+      if (text.at(i).isEqualTo("(")) openingParenthesis++;
+      if (text.at(i).isEqualTo(")")) closingParenthesis++;
 
-      if (openingDelimitersAmount.isEqualTo(closingDelimitersAmount) &&
-          openingDelimitersAmount > 0)
-        return _splitParameters(parametersDeclaration.substring(splitStart, i))
-            .withoutEmptyStrings();
+      if (text.at(i).isEqualTo("<")) openingAngleBrackets++;
+      if (text.at(i).isEqualTo(">")) closingAngleBrackets++;
+
+      if (text.at(i).isEqualTo(",") &&
+          openingAngleBrackets.isEqualTo(closingAngleBrackets) &&
+          openingParenthesis.isEqualTo(closingParenthesis)) {
+        String substring = text.substring(splitStart, i);
+        result.add(substring);
+        splitStart = i + 1;
+      }
     }
 
-    return [];
+    // ? add the last trailing parameter
+    result.add(text.substring(splitStart));
+
+    return result;
   }
 
 
@@ -210,7 +230,7 @@ class MethodAnalyzer {
     return result;
   }
 
-  bool _thereIsEqualSignIn(String parameter) => parameter.indexOf("=") > 0;
+  bool _thereIsEqualSignIn(String parameter) => parameter.contains("=");
 
   List<String> get parametersDeclarations => _parametersDeclarations();
 
@@ -247,37 +267,4 @@ class MethodAnalyzer {
   }
 
 
-// ! parameters list must be without opening "(" and closing ")"
-  List<String> _splitParameters(String text) {
-    List<String> result = [];
-
-    int openingParenthesis = 0;
-    int closingParenthesis = 0;
-
-    int openingAngleBrackets = 0;
-    int closingAngleBrackets = 0;
-
-    int splitStart = 0;
-
-    for (int i = 0; i < text.length; i++) {
-      if (text.at(i).isEqualTo("(")) openingParenthesis++;
-      if (text.at(i).isEqualTo(")")) closingParenthesis++;
-
-      if (text.at(i).isEqualTo("<")) openingAngleBrackets++;
-      if (text.at(i).isEqualTo(">")) closingAngleBrackets++;
-
-      if (text.at(i).isEqualTo(",") &&
-          openingAngleBrackets.isEqualTo(closingAngleBrackets) &&
-          openingParenthesis.isEqualTo(closingParenthesis)) {
-        String substring = text.substring(splitStart, i);
-        result.add(substring);
-        splitStart = i + 1;
-      }
-    }
-
-    // ? add the last trailing parameter
-    result.add(text.substring(splitStart));
-
-    return result;
-  }
 }
