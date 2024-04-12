@@ -4,34 +4,39 @@ import 'ConstructorException.dart';
 import 'Extensions/list__empty_string_remover.dart';
 import 'Extensions/object__equal_objects.dart';
 import 'Extensions/string__element_fetcher.dart';
+import 'Extensions/string_whitespaces_remover.dart';
 import 'String Extractor/delimiters.dart';
 import 'String Extractor/string_extractor.dart';
 import 'parameter.dart';
-import 'parameter_extractor.dart';
 import 'parameter_type.dart';
-
-
+import 'temp/parameters_reporter.dart';
 
 class MethodAnalyzer {
   // TODO: make 'method' private
-  final MethodMirror method;
-  late String _parametersDeclaration;
-  late List<ParameterMirror> _parametersMirrors;
+  MethodMirror method;
+  late String _parametersDeclarationWithoutSpaces;
+  List<ParameterMirror> _parametersMirrors;
 
-  int getParametersStartingIndexIn(String source) {
-    int methodNameIndex = source.indexOf(methodName + "(");
-    return methodNameIndex + methodName.length;
-  }
-
-  MethodAnalyzer(this.method) :
-        _parametersMirrors = method.parameters {
+  MethodAnalyzer(this.method) : _parametersMirrors = method.parameters {
     if (method.isConstructor) throw ConstructorException();
 
-    // ! '_parametersString' is computed here because it is
+    // ! '_parametersDeclarationWithoutSpaces' is computed here because it is
     // ! used in other methods and computing it every single
     // ! time slows execution down
-    final parametersExtractor = ParametersExtractor.of(source);
-    _parametersDeclaration = parametersExtractor.findsParametersOf(methodName);
+    // ! withoutWhiteSpaces() because it makes it easier to use string patterns throughout
+    // ! the entire codebase without the worry to consider them.
+    _parametersDeclarationWithoutSpaces =
+        _extractParametersDeclarationFrom(source);
+    print("source: $source"); // * DEBUG
+  }
+
+  String _extractParametersDeclarationFrom(String source) {
+    int methodNameIndex = source.indexOf(methodName + "(");
+    String leftTrimSource =
+        source.substring(methodNameIndex + methodName.length);
+    return StringExtractor.parsing(leftTrimSource)
+        .extract()
+        .withoutWhiteSpaces();
   }
 
   String get methodName => MirrorSystem.getName(method.simpleName);
@@ -39,81 +44,74 @@ class MethodAnalyzer {
   String get source => method.source!;
 
   List<ParameterMirror> get parametersMirrors => _parametersMirrors;
-  String get parametersDeclaration => _parametersDeclaration;
 
-  String get parametersReport => ""
-      "parameters: $parameters\n"
-      "names: ${[ for (Parameter parameter in parameters) parameter.name ]}\n"
-      "dataTypes: ${[ for (Parameter parameter in parameters) parameter.dataType ]}\n"
-      "required: ${[ for (Parameter parameter in parameters) parameter.isRequired ]}\n"
-      "optional: ${[ for (Parameter parameter in parameters) parameter.isOptional ]}\n"
-      "positional: ${[ for (Parameter parameter in parameters) parameter.isPositional ]}\n"
-      "optionalPositional: ${[ for (Parameter parameter in parameters) parameter.isOptionalPositional ]}\n"
-      "named: ${[ for (Parameter parameter in parameters) parameter.isNamed ]}\n"
-      "hasDefaultValue: ${[ for (Parameter parameter in parameters) parameter.hasDefaultValue ]}\n"
-      "defaultValue: ${[ for (Parameter parameter in parameters) parameter.defaultValue ]}\n"
-      "isNullable: ${[ for (Parameter parameter in parameters) parameter.isNullable ]}\n";
+  String get parametersReport => ParametersReporter().reports(this.parameters);
 
   bool get hasParameters => method.parameters.isNotEmpty;
-  bool get hasNamedParameters => method.parameters.any((parameter) => parameter.isNamed);
-  bool get hasPositionalParameters => method.parameters.any((parameter) => !parameter.isNamed);
 
+  bool get hasNamedParameters =>
+      method.parameters.any((parameter) => parameter.isNamed);
 
-  List<String> get parametersNames => parametersMirrors
-      .map((parameter) => MirrorSystem.getName(parameter.simpleName))
-      .toList();
+  bool get hasPositionalParameters =>
+      method.parameters.any((parameter) => !parameter.isNamed);
+
+  List<String> get parametersNames =>
+      parametersMirrors.map(_parameterMirrorToParameterName).toList();
+
+  String _parameterMirrorToParameterName(ParameterMirror parameter) =>
+      MirrorSystem.getName(parameter.simpleName);
 
   List<String> get _parametersTexts => [
         ..._positionalParameters(),
         ..._optionalPositionalParameters(),
-        ..._namedParameters()
+        ..._namedParameters(),
       ].withoutEmptyStrings();
 
   List<String> _positionalParameters() {
     List<String> optionalPositionalParameters = _optionalPositionalParameters();
     List<String> namedParameters = _namedParameters();
 
-    if (parametersDeclaration == "()") return [];
-    if (optionalPositionalParameters.length == parametersNames.length)
-      return [];
-    if (namedParameters.length == parametersNames.length) return [];
+    if (_parametersDeclarationWithoutSpaces == "()" ||
+        optionalPositionalParameters.length == parametersNames.length ||
+        namedParameters.length == parametersNames.length) return [];
 
-    int endingIndex = parametersDeclaration.length - 1;
+    int endingIndex = _parametersDeclarationWithoutSpaces.length;
 
-    for (int i = 0; i < parametersDeclaration.length - 1; i++) {
-      if (parametersDeclaration.at(i) == "," &&
-          (parametersDeclaration.at(i + 1) == "[" ||
-              parametersDeclaration.at(i + 1) == "{")) {
+    for (int i = 0; i < _parametersDeclarationWithoutSpaces.length - 1; i++) {
+      if (_parametersDeclarationWithoutSpaces.at(i) == "," &&
+          (_parametersDeclarationWithoutSpaces.at(i + 1) == "[" ||
+              _parametersDeclarationWithoutSpaces.at(i + 1) == "{")) {
         endingIndex = i;
       }
     }
 
-    return _splitParameters(parametersDeclaration.substring(1, endingIndex))
-        .withoutEmptyStrings()
+    String parameters =
+        _parametersDeclarationWithoutSpaces.substring(0, endingIndex);
+    List<String> splitParameters = _splitParameters(parameters);
+    List<String> splitParametersWithoutEmptyString =
+        splitParameters.withoutEmptyStrings();
+    List<String> positionalParameters = splitParametersWithoutEmptyString
         .map((parameter) => "Positional::$parameter")
         .toList();
+
+    return positionalParameters;
   }
 
-
   List<String> _optionalPositionalParameters() =>
-      //_getParametersEnclosedIn("[", "]")
-          _getParametersEnclosedIn(Delimiters.SQUARED_BRACKETS)
+      _getParametersEnclosedIn(Delimiters.SQUARED_BRACKETS)
           .map((parameter) => "OptionalPositional::$parameter")
           .toList();
 
-
   List<String> _namedParameters() =>
-      //_getParametersEnclosedIn("{", "}")
       _getParametersEnclosedIn(Delimiters.CURLY_BRACKETS)
-      .map((parameter) => "Named::$parameter")
-      .toList();
+          .map((parameter) => "Named::$parameter")
+          .toList();
 
-
-  List<String> _getParametersEnclosedIn(
-      Delimiters delimiters
-      ) {
-    String parameters = StringExtractor.parsing(parametersDeclaration).within(delimiters).extract();
-    print("EXTRACTED PARAMETERS WITHIN $delimiters -> $parameters");
+  List<String> _getParametersEnclosedIn(Delimiters delimiters) {
+    String parameters =
+        StringExtractor.parsing(_parametersDeclarationWithoutSpaces)
+            .within(delimiters)
+            .extract();
     return _splitParameters(parameters).withoutEmptyStrings();
   }
 
@@ -151,7 +149,6 @@ class MethodAnalyzer {
     return result;
   }
 
-
   List<String> get parametersDefaults => _parametersDefaults();
 
   List<String> _parametersDefaults() {
@@ -167,7 +164,6 @@ class MethodAnalyzer {
 
     return result;
   }
-
 
   List<Parameter> get parameters {
     List<Parameter> result = [];
@@ -204,6 +200,7 @@ class MethodAnalyzer {
       }
       if (parameter.startsWith("OptionalPositional")) {
         isOptionalPositional = true;
+        isPositional = true;
         type = ParameterType.optionalPositional;
       }
       if (parameter.startsWith("Positional")) {
@@ -255,7 +252,7 @@ class MethodAnalyzer {
 
       if (_thereIsEqualSignIn(parameterText))
         parameterPrecedingName =
-        parameterText.substring(0, indexOfEqual - 1).split("::")[1];
+            parameterText.substring(0, indexOfEqual - 1).split("::")[1];
 
       String parameterDataType = parameterPrecedingName;
       if (parameterPrecedingName.startsWith("required"))
@@ -265,6 +262,4 @@ class MethodAnalyzer {
     }
     return result;
   }
-
-
 }
