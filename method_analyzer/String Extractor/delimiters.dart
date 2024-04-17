@@ -9,5 +9,7 @@ enum Delimiters {
 
   const Delimiters(this.opening, this.closing);
 
+  bool contains(String string) => opening == string || closing == string;
+
   String toString() => "'$opening', '$closing'";
 }
