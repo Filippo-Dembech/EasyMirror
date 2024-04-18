@@ -1,18 +1,18 @@
 import '../Extensions/list__empty_string_remover.dart';
 import '../String Extractor/delimiters.dart';
 import 'string_chopper.dart';
-import 'skipping_iterator.dart';
+import 'jumping_iterator.dart';
 
 class SkippingStringSplitter {
   final String _string;
   String _separator;
-  final SkippingIterator _iterator;
+  final JumpingIterator _iterator;
 
   SkippingStringSplitter(
     this._string,
     this._separator, [
     Set<Delimiters> delimitersSet = const {},
-  ]) : _iterator = SkippingIterator(_string, delimitersSet);
+  ]) : _iterator = JumpingIterator(_string, delimitersSet);
 
   List<String> splits() {
     final indexes = _findsIndexesOfSeparator();
@@ -22,20 +22,23 @@ class SkippingStringSplitter {
 
   List<int> _findsIndexesOfSeparator() {
     final result = <int>[];
+      // ! When 'next' is called in the '.forEach()' the index shift
+      // ! by one, so the index within the '.forEach()' doesn't refer
+      // ! to the current character.
     _iterator.forEach((char) {
-      if (char == _separator) result.add(_iterator.currentIndex);
+      if (char == _separator) result.add(_iterator.currentIndex - 1);
     });
     return result;
   }
 
   List<String> _chopString(List<int> indexes) {
     return StringChopper(_string)
-        .chopsAt(indexes, excludingIndexes: true)
+        .chopsAt(Excluded(indexes))
         .withoutEmptyStrings();
   }
 
   void skipAreasDelimitedBy(Set<Delimiters> delimiters) =>
-      _iterator.skippingWithin(delimiters);
+      _iterator.jump(delimiters);
 
   void splitWith(String separator) => _separator = separator;
 }

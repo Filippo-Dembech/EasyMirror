@@ -15,7 +15,7 @@ import '../String Extractor/delimiters.dart';
 /// "sample (string)" // '(string)' is the delimited area defined by the delimiters '()'
 /// "[sample] string" // '[sampe]' is the delimited area defined by the delimiters '[]'
 /// ```
-class SkippingIterator {
+class JumpingIterator {
   /// The parsed string.
   String _string;
 
@@ -26,21 +26,21 @@ class SkippingIterator {
   int _currentIndex = 0;
 
   /// Creates a skipping iterator that iterates over the passed [_string]. The characters contained within the passed delimiters are skipped by the iterator. [_delimitersSet] define the set of delimiters the characters are contained in.
-  SkippingIterator(this._string, [this._delimitersSet = const {}]);
+  JumpingIterator(this._string, [this._delimitersSet = const {}]);
 
   /// Returns the next character.
   String get next => _charAt(_currentIndex++);
 
-  /// Checks whether this iterator has other characters to parse.
+  /// Checks whether this iterator has other characters to iterate over.
   bool get hasNext {
-    _skipDelimitedAreas();
+    _jumpDelimitedAreas();
     return _currentIndex < _string.length;
   }
 
   /// Moves the iterator up to the ending of a delimited area or a set of delimited areas.
-  void _skipDelimitedAreas() {
+  void _jumpDelimitedAreas() {
     while (_withinStringRange() && _inDelimitedArea()) {
-      _skipDelimitedArea();
+      _jumpDelimitedArea();
     }
   }
 
@@ -73,7 +73,7 @@ class SkippingIterator {
   }
 
   /// Moves the iterator at the end of the current delimited area.
-  void _skipDelimitedArea() {
+  void _jumpDelimitedArea() {
     String? closingDelimiter = _closingDelimiterOf(_currentChar);
     while (_currentChar != closingDelimiter) _currentIndex++;
     _currentIndex++; // to skip also the closing delimiter
@@ -101,22 +101,30 @@ class SkippingIterator {
   }
 
   /// Gives the iterator a new [string] to parse.
-  SkippingIterator iterateOver(String string) {
+  JumpingIterator iterateOver(String string) {
     _string = string;
     revertIteration();
     return this;
   }
 
   /// Specifies the new delimiters set.
-  SkippingIterator skippingWithin(Set<Delimiters> newDelimitersSet) {
+  JumpingIterator jump(Set<Delimiters> newDelimitersSet) {
     _delimitersSet = newDelimitersSet;
     return this;
   }
 
+  /// Returns the index the iterator points at.
+  ///
+  /// __NOTE__: it doesn't point at the current fetched character.
+  /// this could be a problem in the [SkippingIterator.forEach]
+  /// because [currentIndex] isn't refferring to the index of the
+  /// current character but it refers to the index of the _next_
+  /// one.
   int get currentIndex => _currentIndex;
 
+  /// Loops throught all the characters and execute the passed function upon each of them.
   void forEach(Function(String) f) {
-    while(hasNext) {
+    while (hasNext) {
       f(next);
     }
   }
