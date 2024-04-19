@@ -25,8 +25,8 @@ class JumpingIterator {
   /// The current index representing the position of the iterator within the [_string].
   int _currentIndex = 0;
 
-  /// Creates a skipping iterator that iterates over the passed [_string]. The characters contained within the passed delimiters are skipped by the iterator. [_delimitersSet] define the set of delimiters the characters are contained in.
-  JumpingIterator(this._string, [this._delimitersSet = const {}]);
+  /// Creates a jumping iterator that iterates over the passed [_string]. The characters contained within the passed delimiters are skipped by the iterator. [_delimitersSet] define the set of delimiters the characters are contained in.
+  JumpingIterator(this._string, this._delimitersSet);
 
   /// Returns the next character.
   String get next => _charAt(_currentIndex++);
@@ -48,14 +48,15 @@ class JumpingIterator {
   bool _withinStringRange() => _currentIndex < _string.length;
 
   /// Checks whether the iterator points to a delimited area.
-  bool _inDelimitedArea() {
-    if (_charIsAnOpeningDelimiter() && _thereIsClosingDelimiter()) {
-      return true;
-    }
-    return false;
-  }
+  /// 
+  /// A delimited area is defined by all the characters that live
+  /// within an opening delimiter and its corresponding closing
+  /// delimiter. The delimiters are included as part of the
+  /// delimited area.
+  bool _inDelimitedArea() =>
+      _charIsAnOpeningDelimiter() && _thereIsClosingDelimiter();
 
-  /// Checks whether the current character is one of the opening delimiters defined in [_delimitersSet].
+  /// Checks whether the current character is one of the opening delimiters present in [_delimitersSet].
   bool _charIsAnOpeningDelimiter() =>
       _delimitersSet.any(_openingDelimiterMatch);
 
@@ -65,28 +66,30 @@ class JumpingIterator {
 
   /// Checks whether the current opening delimiter has also a matching closing delimiter.
   bool _thereIsClosingDelimiter() {
-    String? closingDelimiter = _closingDelimiterOf(_currentChar);
-    for (int i = _currentIndex; i < _string.length; i++) {
-      if (_charAt(i) == closingDelimiter) return true;
-    }
-    return false;
+    return _string
+        .substring(_currentIndex)
+        .contains(_closingDelimiterOf(_currentChar));
   }
 
   /// Moves the iterator at the end of the current delimited area.
   void _jumpDelimitedArea() {
-    String? closingDelimiter = _closingDelimiterOf(_currentChar);
+    String closingDelimiter = _closingDelimiterOf(_currentChar);
     while (_currentChar != closingDelimiter) _currentIndex++;
     _currentIndex++; // to skip also the closing delimiter
   }
 
   /// Returns the matching closing delimiter of the passed [openingDelimiter], if any.
-  String? _closingDelimiterOf(String openingDelimiter) {
+  String _closingDelimiterOf(String openingDelimiter) {
+    return _delimitersSet
+        .firstWhere((delimiters) => _currentChar == delimiters.opening)
+        .closing;
+    /*
     for (var delimiters in _delimitersSet) {
       if (openingDelimiter == delimiters.opening) {
         return delimiters.closing;
       }
     }
-    return null;
+    */
   }
 
   /// Returns the current character the iterator is pointing at.
