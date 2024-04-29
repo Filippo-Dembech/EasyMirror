@@ -1,0 +1,14 @@
+{
+  "configVersion": 2,
+  "packages": [
+    {
+      "name": "easy_mirror",
+      "rootUri": "../",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    }
+  ],
+  "generated": "2024-04-29T09:46:12.620267Z",
+  "generator": "pub",
+  "generatorVersion": "3.3.4"
+}

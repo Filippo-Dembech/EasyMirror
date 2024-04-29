@@ -1,9 +1,9 @@
 import 'dart:mirrors';
 
-import 'logger/logger_test.dart';
-import 'method_analyzer/method_analyzer.dart';
-import 'runner/runner.dart';
-import 'running_manager.dart';
+import '../lib/logger/logger_test.dart';
+import '../lib/method_analyzer/method_analyzer.dart';
+import '../lib/runner/runner.dart';
+import '../lib/running_manager.dart';
 
 class test {
   const test();

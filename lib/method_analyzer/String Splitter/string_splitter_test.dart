@@ -7,15 +7,16 @@ void p(String string, [Set<Delimiters> delimiters = const {}]) {
   stdout.write("'");
 
   final iterator = JumpingIterator(string, delimiters);
-  while (iterator.hasNext) {
-    stdout.write(iterator.next);
-  }
+  // iterator.forEach(stdout.write);
+  iterator.forEach(stdout.write);
   stdout.write("'");
   print("");
 
 }
 
 void main() {
+
+
 
   p("hello, (mate)");  // "hello, (mate)"
   p("hello, (mate)", {Delimiters.ROUND_BRACKETS});  // "hello, "
@@ -26,7 +27,6 @@ void main() {
   p("{where (are, you?) [mate!]", {Delimiters.ROUND_BRACKETS, Delimiters.SQUARED_BRACKETS, Delimiters.CURLY_BRACKETS}); // "  "
   p("{where} are, you?) [mate!]", {Delimiters.ROUND_BRACKETS, Delimiters.SQUARED_BRACKETS, Delimiters.CURLY_BRACKETS}); // "  "
   p("{where} (are, you?) [mate!", {Delimiters.ROUND_BRACKETS, Delimiters.SQUARED_BRACKETS, Delimiters.CURLY_BRACKETS}); // "  "
-
   /*
   splitPrint(SkippingStringSplitter("hi, there", ",").splits());
   splitPrint(SkippingStringSplitter(
