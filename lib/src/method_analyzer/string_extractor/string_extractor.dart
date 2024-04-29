@@ -10,7 +10,6 @@ import 'delimiters.dart';
 /// the used strategy the extracted substring may vary.
 class StringExtractor {
   String _text = "";
-  Delimiters _delimiters = Delimiters.ROUND_BRACKETS;
   Extraction _extractionStrategy = MatchingDelimitersExtraction();
 
   StringExtractor();
@@ -23,18 +22,20 @@ class StringExtractor {
     this._text,
   );
 
+  // ! DEPRECATED
   /// Defines the [text] parsed by the [StringExtractor]
-  StringExtractor parsing(String text) {
-    _text = text;
-    return this;
-  }
+  // StringExtractor parsing(String text) {
+  //   _text = text;
+  //  return this;
+  // }
 
+  // ! DEPRECATED
   /// Defines the [Delimiters] used to parse this
   /// text.
-  StringExtractor within(Delimiters delimiters) {
-    _delimiters = delimiters;
-    return this;
-  }
+  // StringExtractor within(Delimiters delimiters) {
+  //   _delimiters = delimiters;
+  //   return this;
+  // }
 
   /// Defines the [Extraction] strategy used to
   /// define the delimiting area.
@@ -43,6 +44,7 @@ class StringExtractor {
     return this;
   }
 
+  // ! DEPRECATED
   /// Extracts the substrings of the passed text within the
   /// [Delimiters] defined with the [StringExtractor.within] method.
   /// The way the delimiting area is computed depends on the
@@ -50,7 +52,7 @@ class StringExtractor {
   /// with the [StringExtractor.using] method - [MatchingDelimitersExtraction] by default.
   /// Check [Extractions] class to check all the available
   /// strategies. [Delimiters] are [Delimiters.ROUND_BRACKETS] by default.
-  String extract() => _extractionStrategy.extract(_text, _delimiters);
+  // String extracts() => _extractionStrategy.extract(_text, _delimiters);
 
   /// Extracts the substrings of the passed text within the passed
   /// [Delimiters]. The way the delimiting area is computed depends on the

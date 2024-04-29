@@ -153,44 +153,11 @@ class Test {
 void main() {
   final a = reflect(Test());
 
-  /*
-  final method = MethodAnalyzer(a.type.declarations[#f] as MethodMirror);
-  print("=============== ${method.name} ===============");
-  print("named parameters: ${method.namedParameters}");
-  print("parameters: ${method.parametersNames}");
-  print("parameters list: ${method.parametersList}");
-  */
-
   a.type.declarations.forEach((symbol, declaration) {
     if (declaration is MethodMirror && !declaration.isConstructor) {
       final method = MethodAnalyzer(declaration);
       print("======" + method.methodName + "======");
       print("${method.parametersReport}");
-      // print("parameters declaration: ${method.parametersDeclaration}");
-      // print(method.positionalParameters);
-      // print("named parameters: ${method.namedParameters}");
-      // print("parameters texts:\t\t\t${method.parametersTexts}");
-      // print("parameters names:\t\t\t${method.parametersNames}");
-      // print("parameters data types:\t\t${method.parametersDataTypes}");
-      // print("parameters declarations:\t${method.parametersDeclarations}");
     }
   });
-
-  /*
-  a.simpleGeneralRun(
-    positionals: {
-      #thirdTest: [3, 8],
-      #fifthTest: ["Princess", 40]
-    },
-    named: {
-      #fourthTest: {
-        #name: "Princess Caoline",
-        #age: 32
-      },
-      #fifthTest: {
-        #lastName: "Caroline",
-      }
-    },
-  );
-   */
 }
