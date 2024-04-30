@@ -1,0 +1,4 @@
+library easy_mirror;
+
+export "src/method_analyzer/string_splitter/jumping_iterator.dart";
+export "src/method_analyzer/string_extractor/delimiters.dart";

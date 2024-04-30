@@ -34,11 +34,11 @@ class JumpingIterator {
   /// Creates a jumping iterator that iterates over the passed [_string]. The characters contained within the passed delimiters are skipped by the iterator. [_delimitersSet] define the set of delimiters the characters are contained in.
   JumpingIterator(this._string, this._delimitersSet);
 
-  /// Returns the next character.
-  String get next => _charAt(++_currentIndex);
+  String get next {
+    _currentIndex++;
+    return _string[_currentIndex];
+  }
 
-  /// Checks whether this iterator has other non-contained characters
-  /// to iterate over.
   bool get hasNext {
     _jumpDelimitedAreas();
     return _hasNextChar();
@@ -79,16 +79,37 @@ class JumpingIterator {
   /// Checks whether the current opening delimiter has also a
   /// matching closing delimiter.
   bool _isThereClosingDelimiter() {
-    return _string
-        .substring(_currentIndex + 1)
-        .contains(_closingDelimiterOf(_followingChar));
+    // ! this check prevents RangeError
+    if (_currentIndex + 2 > _string.length) return false;
+
+    String openingDelimiter = _followingChar;
+    String closingDelimiter = _closingDelimiterOf(_followingChar);
+
+    int openingDelimitersAmount = 1;
+    int closingDelimitersAmount = 0;
+
+    for (int i = _currentIndex + 2; i < _string.length; i++) {
+      if (_string[i] == openingDelimiter) openingDelimitersAmount++;
+      if (_string[i] == closingDelimiter) closingDelimitersAmount++;
+      if (openingDelimitersAmount == closingDelimitersAmount) return true;
+    }
+    return false;
   }
 
   /// Moves the iterator at the end of the current delimited area.
   void _jumpDelimitedArea() {
+    String openingDelimiter = _followingChar;
     String closingDelimiter = _closingDelimiterOf(_followingChar);
-    while (_followingChar != closingDelimiter) _currentIndex++;
-    _currentIndex++; // to skip the closing delimiter
+
+    int openingDelimitersAmount = 1;
+    int closingDelimitersAmount = 0;
+
+    while (openingDelimitersAmount != closingDelimitersAmount) {
+      if (_string[_currentIndex + 2] == openingDelimiter) openingDelimitersAmount++;
+      if (_string[_currentIndex + 2] == closingDelimiter) closingDelimitersAmount++;
+      _currentIndex++;
+    }
+    _currentIndex++;
   }
 
   /// Returns the matching closing delimiter of the passed
@@ -112,16 +133,14 @@ class JumpingIterator {
   }
 
   /// Gives the iterator a new [string] to parse.
-  JumpingIterator iterateOver(String string) {
+  void iterateOver(String string) {
     _string = string;
     revertIteration();
-    return this;
   }
 
   /// Specifies the new delimiters set.
-  JumpingIterator jump(Set<Delimiters> newDelimitersSet) {
+  void jump(Set<Delimiters> newDelimitersSet) {
     _delimitersSet = newDelimitersSet;
-    return this;
   }
 
   /// Returns the index the iterator points at.
