@@ -1,3 +1,6 @@
+import 'package:collection/collection.dart';
+import 'package:easy_mirror/src/method_analyzer/extensions/list__empty_string_remover.dart';
+
 /// An utility class to chop a string.
 ///
 /// The string passed to the constructor will be parsed and chopped
@@ -51,6 +54,7 @@ class StringChopper {
   /// ```
   List<String> chopsAt(ChoppingStrategy choppingStrategy) {
     // TODO: method with multiple responsibilities (validate indexes and compute chunks)
+    if (_string.isEmpty) return [""];
     _checkInRange(choppingStrategy._indexes);
     return choppingStrategy.chops(_string);
   }
@@ -84,14 +88,19 @@ abstract class ChoppingStrategy {
   const ChoppingStrategy(this._indexes);
 
   List<String> chops(String string) {
+    if (!_indexes.isSorted((a, b) => a.compareTo(b)))
+      throw UnsortedIndexesException(
+          "given indexes $_indexes are not sorted. Only provide sorted indexes with ChoppingStrategies");
+
     List<String> result = [];
     int chunkStart = 0;
     for (int chunkEnd in _indexes) {
-      result.add(string.substring(chunkStart, chunkEnd));
+      var chunk = string.substring(chunkStart, chunkEnd);
+      result.add(chunk);
       chunkStart = _shift(chunkEnd);
     }
     result.add(string.substring(chunkStart));
-    return result;
+    return result.withoutEmptyStrings();
   }
 
   int _shift(int chunkEnd);
@@ -142,4 +151,12 @@ class ChoppingException implements Exception {
 
   @override
   String toString() => "ChoppingException: $_message";
+}
+
+class UnsortedIndexesException implements Exception {
+  String _message;
+  UnsortedIndexesException(this._message);
+
+  @override
+  String toString() => "UnsortedIndexesException: $_message";
 }

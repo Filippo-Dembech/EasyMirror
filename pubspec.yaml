@@ -3,5 +3,8 @@ name: easy_mirror
 environment:
   sdk: '^3.0.0'
 
+dependencies:
+  collection:
+
 dev_dependencies:
   test: ^1.25.4

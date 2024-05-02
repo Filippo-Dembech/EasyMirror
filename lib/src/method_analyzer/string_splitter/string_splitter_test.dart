@@ -14,26 +14,7 @@ void p(String string, [Set<Delimiters> delimiters = const {}]) {
 }
 
 void main() {
-  // p("((hi)", {Delimiters.ROUND_BRACKETS});
 
-  p("");
-  p("hi there");
-  p("(hi) there");
-  p("(hi) there", {Delimiters.ROUND_BRACKETS});
-  p("((hi))) ((there)", {Delimiters.ROUND_BRACKETS});
-  p("((hi) there", {Delimiters.ROUND_BRACKETS});
-
-/*
-
-  p("hello, (mate)");  // "hello, (mate)"
-  p("hello, (mate)", {Delimiters.ROUND_BRACKETS});  // "hello, "
-  p("{where} (are, you?) [mate!]"); // "{where} (are, you?) [mate!]"
-  p("{where} (are, you?) [mate!]", {Delimiters.ROUND_BRACKETS}); // "{where}  [mate!]"
-  p("{where} (are, you?) [mate!]", {Delimiters.ROUND_BRACKETS, Delimiters.SQUARED_BRACKETS}); // "{where}  "
-  p("{where} (are, you?) [mate!]", {Delimiters.ROUND_BRACKETS, Delimiters.SQUARED_BRACKETS, Delimiters.CURLY_BRACKETS}); // "  "
-  p("{where (are, you?) [mate!]", {Delimiters.ROUND_BRACKETS, Delimiters.SQUARED_BRACKETS, Delimiters.CURLY_BRACKETS}); // "  "
-  p("{where} are, you?) [mate!]", {Delimiters.ROUND_BRACKETS, Delimiters.SQUARED_BRACKETS, Delimiters.CURLY_BRACKETS}); // "  "
-  p("{where} (are, you?) [mate!", {Delimiters.ROUND_BRACKETS, Delimiters.SQUARED_BRACKETS, Delimiters.CURLY_BRACKETS}); // "  "
   splitPrint(SkippingStringSplitter("hi, there", ",").splits());
   splitPrint(SkippingStringSplitter(
       "hi, (there, mate)", ",", {Delimiters.ROUND_BRACKETS}).splits());
@@ -52,7 +33,6 @@ void main() {
     Delimiters.SQUARED_BRACKETS,
     Delimiters.CURLY_BRACKETS
   }).splits());
-  */
 }
 
 void splitPrint(List<String> list) {
