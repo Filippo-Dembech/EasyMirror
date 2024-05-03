@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 String iterateOver(String string, [Set<Delimiters> delimiters = const {}]) {
   String result = "";
   final iterator = JumpingIterator(string, delimiters);
-  iterator.forEach((char) => result += char);
+  iterator.forEach((char, index) => result += char);
   return result;
 }
 

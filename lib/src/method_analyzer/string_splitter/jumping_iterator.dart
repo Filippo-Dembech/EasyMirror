@@ -79,7 +79,7 @@ class JumpingIterator {
   /// Checks whether the current opening delimiter has also a
   /// matching closing delimiter.
   bool _isThereClosingDelimiter() {
-    // ! this check prevents RangeError
+    // * this check prevents RangeError
     if (_currentIndex + 2 > _string.length) return false;
 
     String openingDelimiter = _followingChar;
@@ -143,14 +143,11 @@ class JumpingIterator {
     _delimitersSet = newDelimitersSet;
   }
 
-  /// Returns the index the iterator points at.
-  int get currentIndex => _currentIndex;
-
   /// Loops throught all the characters and execute the passed
   /// function upon each of them.
-  void forEach(void Function(String) f) {
+  void forEach(void Function(String, int) f) {
     while (hasNext) {
-      f(next);
+      f(next, _currentIndex);
     }
   }
 }

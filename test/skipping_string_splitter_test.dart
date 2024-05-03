@@ -3,6 +3,6 @@ import 'package:test/test.dart';
 
 void main() {
   test("StringSplitter with no delimiters", () {
-    expect(SkippingStringSplitter("hi, there", ",").splits(),equals(["hi", " there"]));
+    expect(SkippingStringSplitter("hi, there", separator: ",").splits(),equals(["hi", " there"]));
   });
 }

@@ -5,14 +5,12 @@ import 'jumping_iterator.dart';
 
 class SkippingStringSplitter {
   final String _string;
-  String _separator;
+  final String separator;
   final JumpingIterator _iterator;
 
   SkippingStringSplitter(
     this._string,
-    this._separator, [
-    Set<Delimiters> delimitersSet = const {},
-  ]) : _iterator = JumpingIterator(_string, delimitersSet);
+    {required this.separator}) : _iterator = JumpingIterator(_string, {});
 
   List<String> splits() {
     final indexes = _findsIndexesOfSeparator();
@@ -25,8 +23,8 @@ class SkippingStringSplitter {
       // ! When 'next' is called in the '.forEach()' the index shift
       // ! by one, so the index within the '.forEach()' doesn't refer
       // ! to the current character.
-    _iterator.forEach((char) {
-      if (char == _separator) result.add(_iterator.currentIndex - 1);
+    _iterator.forEach((char, index) {
+      if (char == separator) result.add(index);
     });
     return result;
   }
@@ -40,5 +38,5 @@ class SkippingStringSplitter {
   void skipAreasDelimitedBy(Set<Delimiters> delimiters) =>
       _iterator.jump(delimiters);
 
-  void splitWith(String separator) => _separator = separator;
+  void splitWith(String separator) => separator = separator;
 }
