@@ -38,5 +38,4 @@ class SkippingStringSplitter {
   void skipAreasDelimitedBy(Set<Delimiters> delimiters) =>
       _iterator.jump(delimiters);
 
-  void splitWith(String separator) => separator = separator;
 }
