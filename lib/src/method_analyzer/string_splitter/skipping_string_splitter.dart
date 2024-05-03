@@ -8,9 +8,12 @@ class SkippingStringSplitter {
   final String separator;
   final JumpingIterator _iterator;
 
-  SkippingStringSplitter(
-    this._string,
-    {required this.separator}) : _iterator = JumpingIterator(_string, {});
+  SkippingStringSplitter(this._string, {required this.separator})
+      : _iterator = JumpingIterator(_string, {}) {
+    if (separator.length > 1)
+      throw InvalidSeparatorException(
+          "'$separator' isn't a valid separator. A separator can't be more than one character long.");
+  }
 
   List<String> splits() {
     final indexes = _findsIndexesOfSeparator();
@@ -20,9 +23,9 @@ class SkippingStringSplitter {
 
   List<int> _findsIndexesOfSeparator() {
     final result = <int>[];
-      // ! When 'next' is called in the '.forEach()' the index shift
-      // ! by one, so the index within the '.forEach()' doesn't refer
-      // ! to the current character.
+    // ! When 'next' is called in the '.forEach()' the index shift
+    // ! by one, so the index within the '.forEach()' doesn't refer
+    // ! to the current character.
     _iterator.forEach((char, index) {
       if (char == separator) result.add(index);
     });
@@ -35,7 +38,15 @@ class SkippingStringSplitter {
         .withoutEmptyStrings();
   }
 
-  void skipAreasDelimitedBy(Set<Delimiters> delimiters) =>
+  void ignoringSeparatorsWithin(Set<Delimiters> delimiters) =>
       _iterator.jump(delimiters);
+}
 
+class InvalidSeparatorException implements Exception {
+  final String _message;
+
+  const InvalidSeparatorException(this._message);
+
+  @override
+  String toString() => "InvalidSeparatorException: $_message";
 }
