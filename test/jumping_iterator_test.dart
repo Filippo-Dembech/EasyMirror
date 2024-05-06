@@ -9,7 +9,7 @@ String iterateOver(String string, [Set<Delimiters> delimiters = const {}]) {
 }
 
 void main() {
-  test("JumpingIterator with no delimiters set", () {
+  test("no delimiters set", () {
     expect(iterateOver(""), equals(""));
     expect(iterateOver("hi"), equals("hi"));
     expect(iterateOver("hi there"), equals("hi there"));
@@ -25,7 +25,7 @@ void main() {
     expect(iterateOver("[]"), equals("[]"));
   });
 
-  test("JumpIterator with matching round delimiters", () {
+  test("matching round delimiters", () {
     expect(iterateOver("(hi)", {Delimiters.ROUND_BRACKETS}), equals(""));
     expect(iterateOver("()", {Delimiters.ROUND_BRACKETS}), equals(""));
     expect(iterateOver("(hi) there", {Delimiters.ROUND_BRACKETS}),
@@ -36,7 +36,7 @@ void main() {
     expect(iterateOver("(((hi)))", {Delimiters.ROUND_BRACKETS}), equals(""));
   });
 
-  test("JumpingIterator with unmatching round delimiters", () {
+  test("unmatching round delimiters", () {
     expect(iterateOver("(", {Delimiters.ROUND_BRACKETS}), equals("("));
     expect(iterateOver(")", {Delimiters.ROUND_BRACKETS}), equals(")"));
     expect(iterateOver("((hi)", {Delimiters.ROUND_BRACKETS}), equals("("));
@@ -58,7 +58,7 @@ void main() {
         equals(" r)e)"));
   });
 
-  test("JumpingIterator with mixed matching delimiters", () {
+  test("mixed matching delimiters", () {
     expect(
         iterateOver("()[]{}<>", {
           Delimiters.ROUND_BRACKETS,
@@ -149,7 +149,7 @@ void main() {
         equals("where"));
   });
 
-  test("JumpingIterator with mixed unmatching delimiters", () {
+  test("mixed unmatching delimiters", () {
     expect(
         iterateOver("([]{}<>", {
           Delimiters.ROUND_BRACKETS,
