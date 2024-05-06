@@ -18,6 +18,28 @@ enum Delimiters {
   static Delimiters of(String string) =>
       Delimiters.values.firstWhere((delimiters) => delimiters.contains(string));
 
+  // TODO: refactor
+  static List<MatchIndexes> allMatchesIndexes(
+      Delimiters delimiters, String string) {
+    List<MatchIndexes> result = [];
+    for (int i = 0; i < string.length; i++) {
+      if (string[i] == delimiters.opening) {
+        int openingDelimitersCount = 0;
+        int closingDelimitersCount = 0;
+        for (int j = i; j < string.length; j++) {
+          if (string[j] == delimiters.opening) openingDelimitersCount++;
+          if (string[j] == delimiters.closing) closingDelimitersCount++;
+          if (openingDelimitersCount == closingDelimitersCount) {
+            result.add((i, j));
+            break;
+          }
+          ;
+        }
+      }
+    }
+    return result;
+  }
+
   static countOperation(
       Delimiters delimiters,
       Function(
@@ -34,3 +56,5 @@ enum Delimiters {
 
   String toString() => "'$opening', '$closing'";
 }
+
+typedef MatchIndexes = (int, int);
