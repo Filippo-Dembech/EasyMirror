@@ -69,4 +69,20 @@ void main() {
     expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "((abc))"), equals([(0,6), (1,5)]));
     expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "((abc)(def))"), equals([(0,11), (1,5), (6,10)]));
   });
+
+  test("matches with unmatching delimiters", () {
+    expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "("), equals([]));
+    expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, ")"), equals([]));
+    expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "(("), equals([]));
+    expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "))"), equals([]));
+    expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "(()"), equals([(1,2)]));
+    expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "()))"), equals([(0,1)]));
+
+    expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "(a"), equals([]));
+    expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "a)"), equals([]));
+    expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "((a"), equals([]));
+    expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "a))"), equals([]));
+    expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "((a)"), equals([(1,3)]));
+    expect(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "(a)))"), equals([(0,2)]));
+  });
 }

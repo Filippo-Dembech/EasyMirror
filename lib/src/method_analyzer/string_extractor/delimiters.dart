@@ -20,7 +20,9 @@ enum Delimiters {
 
   // TODO: refactor
   static List<MatchIndexes> allMatchesIndexes(
-      Delimiters delimiters, String string) {
+    Delimiters delimiters,
+    String string,
+  ) {
     List<MatchIndexes> result = [];
     for (int i = 0; i < string.length; i++) {
       if (string[i] == delimiters.opening) {

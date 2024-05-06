@@ -1,3 +1,4 @@
+import 'package:easy_mirror/src/method_analyzer/extensions/list__empty_string_remover.dart';
 import 'package:easy_mirror/src/method_analyzer/extensions/string__char_count.dart';
 import 'delimiters.dart';
 
@@ -58,25 +59,24 @@ class StringExtractor {
   /// with the [StringExtractor.using] method - [MatchingDelimitersExtraction] by default.
   /// Check [Extractions] class to check all the available
   /// strategies.
-  String extractsStringWithin(Delimiters delimiters) =>
-      _extractionStrategy.extract(_text, delimiters);
+  List<String> extractsStringWithin(Delimiters delimiters) {
+      return _extractionStrategy.extract(_text, delimiters); // TODO: remove index [0]
+  }
 }
-
 
 class Extractions {
   static Extraction viseExtraction() => ViseExtraction();
-  static Extraction matchingDelimitersExtraction() => MatchingDelimitersExtraction();
+  static Extraction matchingDelimitersExtraction() =>
+      MatchingDelimitersExtraction();
 }
-
 
 /// Define the algorithm that the [StringExtractor]
 /// can use to parse its text and extract the substring
 /// within the delimiters.
 abstract class Extraction {
   const Extraction();
-  String extract(String string, Delimiters delimiters);
+  List<String> extract(String string, Delimiters delimiters);
 }
-
 
 /// When [MatchingDelimitersExtraction] is used by
 /// [StringExtractor] the delimiting area is defined
@@ -97,57 +97,15 @@ final class MatchingDelimitersExtraction extends Extraction {
   const MatchingDelimitersExtraction();
 
   @override
-  String extract(String string, Delimiters delimiters) {
-    validateMatchingOf(string, delimiters);
-
-    if (string.indexOf(delimiters.opening) == -1) return "";
-
-    String delimitedSubstring =
-    string.substring(string.indexOf(delimiters.opening));
-
-    int openingDelimiterCount = 0;
-    int closingDelimiterCount = 0;
-    int substringEndingIndex = 0;
-
-    for (int i = 0; i < delimitedSubstring.length; i++) {
-      if (delimitedSubstring[i] == delimiters.opening) openingDelimiterCount++;
-      if (delimitedSubstring[i] == delimiters.closing) closingDelimiterCount++;
-      if (openingDelimiterCount == closingDelimiterCount) {
-        substringEndingIndex = i;
-        break;
-      }
-    }
-    return delimitedSubstring.substring(1, substringEndingIndex);
+  List<String> extract(String string, Delimiters delimiters) {
+    List<String> result = [];
+    for (var indexes in Delimiters.allMatchesIndexes(delimiters, string)) {
+      result.add(string.substring(indexes.$1 + 1, indexes.$2));
+    };
+    return result.withoutEmptyStrings();
   }
 
 
-  /// If the number of opening delimiters isn't equal to the
-  /// amount of closing delimiters [NonMatchingDelimitersException]
-  /// is thrown because [MatchingDelimitersExtraction] relies
-  /// on the assumption that the parsed text has a complete and
-  /// finite set of matching delimiters.
-  /// ---
-  /// Example:
-  /// ```dart
-  /// String matching = "((hi) there)"
-  /// String nonMatching = "((hi) there"
-  /// StringExtractor.parsing(matching).extract(); // (hi) there
-  /// StringExtractor.parsing(nonMatching).extract(); // throws NonMatchingDelimitersException
-  /// ```
-  /// The second extraction throws the exception because
-  /// the `nonMatching` string has 2 opening delimiters (`(`)
-  /// but only 1 closing delimiter (`)`). Because the amount
-  void validateMatchingOf(String string, Delimiters delimiters) {
-    int openingDelimiterCount = string.counts(delimiters.opening);
-    int closingDelimiterCount = string.counts(delimiters.closing);
-
-    if (openingDelimiterCount != closingDelimiterCount)
-      throw UnmatchingDelimitersException(
-        delimiters,
-        openingDelimiterCount,
-        closingDelimiterCount,
-      );
-  }
 }
 
 /// When [ViseExtraction] is used by
@@ -168,17 +126,17 @@ final class MatchingDelimitersExtraction extends Extraction {
 final class ViseExtraction extends Extraction {
   const ViseExtraction();
 
-  String extract(String string, Delimiters delimiters) {
+  List<String> extract(String string, Delimiters delimiters) {
     int firstOpeningDelimiterIndex = string.indexOf(delimiters.opening) + 1;
     int lastClosingDelimiterIndex = string.lastIndexOf(delimiters.closing);
 
-    return (firstOpeningDelimiterIndex == -1 || lastClosingDelimiterIndex == -1)
-        ? ""
-        : string.substring(
-            firstOpeningDelimiterIndex, lastClosingDelimiterIndex);
+    if (firstOpeningDelimiterIndex != -1 && lastClosingDelimiterIndex != -1)
+      return [string.substring(
+          firstOpeningDelimiterIndex, lastClosingDelimiterIndex)].withoutEmptyStrings();
+    else
+      return [];
   }
 }
-
 
 class UnmatchingDelimitersException implements Exception {
   Delimiters _delimiters;
@@ -186,10 +144,10 @@ class UnmatchingDelimitersException implements Exception {
   int _closingDelimitersCount = 0;
 
   UnmatchingDelimitersException(
-      this._delimiters,
-      this._openingDelimitersCount,
-      this._closingDelimitersCount,
-      );
+    this._delimiters,
+    this._openingDelimitersCount,
+    this._closingDelimitersCount,
+  );
 
   @override
   String toString() =>
