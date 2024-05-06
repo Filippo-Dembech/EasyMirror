@@ -31,4 +31,17 @@ void main() {
 
     expect(Delimiters.isClosingDelimiter("a"), isFalse);
   });
+
+
+  test("from string to delimiters", () {
+    expect(Delimiters.of(")"), equals(Delimiters.ROUND_BRACKETS));
+    expect(Delimiters.of("]"), equals(Delimiters.SQUARED_BRACKETS));
+    expect(Delimiters.of("}"), equals(Delimiters.CURLY_BRACKETS));
+    expect(Delimiters.of(">"), equals(Delimiters.DIAMOND_BRACKETS));
+
+    expect(Delimiters.of("("), equals(Delimiters.ROUND_BRACKETS));
+    expect(Delimiters.of("["), equals(Delimiters.SQUARED_BRACKETS));
+    expect(Delimiters.of("{"), equals(Delimiters.CURLY_BRACKETS));
+    expect(Delimiters.of("<"), equals(Delimiters.DIAMOND_BRACKETS));
+  });
 }

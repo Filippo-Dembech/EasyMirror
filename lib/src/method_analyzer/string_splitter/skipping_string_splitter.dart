@@ -9,7 +9,7 @@ class SkippingStringSplitter {
   final JumpingIterator _iterator;
 
   SkippingStringSplitter(this._string, {required this.separator})
-      : _iterator = JumpingIterator(_string, {}) {
+      : _iterator = JumpingIterator(_string, delimitersSet: {}) {
     if (separator.length > 1)
       throw InvalidSeparatorException(
           "'$separator' isn't a valid separator. A separator can't be more than one character long.");
