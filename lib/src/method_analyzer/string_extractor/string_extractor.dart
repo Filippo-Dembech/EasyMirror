@@ -1,6 +1,4 @@
-import 'extracting_strategies/extraction.dart';
-import 'extracting_strategies/matching_delimiters_extraction.dart';
-import 'extracting_strategies/extractions.dart';
+import 'package:easy_mirror/src/method_analyzer/extensions/string__char_count.dart';
 import 'delimiters.dart';
 
 /// Extracts substring delimited by defined delimiters
@@ -62,4 +60,138 @@ class StringExtractor {
   /// strategies.
   String extractsStringWithin(Delimiters delimiters) =>
       _extractionStrategy.extract(_text, delimiters);
+}
+
+
+class Extractions {
+  static Extraction viseExtraction() => ViseExtraction();
+  static Extraction matchingDelimitersExtraction() => MatchingDelimitersExtraction();
+}
+
+
+/// Define the algorithm that the [StringExtractor]
+/// can use to parse its text and extract the substring
+/// within the delimiters.
+abstract class Extraction {
+  const Extraction();
+  String extract(String string, Delimiters delimiters);
+}
+
+
+/// When [MatchingDelimitersExtraction] is used by
+/// [StringExtractor] the delimiting area is defined
+/// as the first area of the parsed text where
+/// the amount of opening delimiters is equal to the
+/// amount of closing delimiters.
+/// ---
+/// Example:
+/// Given that the delimiters are round brackets...
+/// ```dart
+/// "Hi (there)"  // returns -> "there"
+/// "((Hi)) there" // returns -> "(Hi)"
+/// "((Hi) there)" // returns -> "(Hi) There"
+/// "(Hi) (there)" // returns -> "Hi"
+/// "((Hi there" // throws NonMatchingDelimitersException
+/// ```
+final class MatchingDelimitersExtraction extends Extraction {
+  const MatchingDelimitersExtraction();
+
+  @override
+  String extract(String string, Delimiters delimiters) {
+    validateMatchingOf(string, delimiters);
+
+    if (string.indexOf(delimiters.opening) == -1) return "";
+
+    String delimitedSubstring =
+    string.substring(string.indexOf(delimiters.opening));
+
+    int openingDelimiterCount = 0;
+    int closingDelimiterCount = 0;
+    int substringEndingIndex = 0;
+
+    for (int i = 0; i < delimitedSubstring.length; i++) {
+      if (delimitedSubstring[i] == delimiters.opening) openingDelimiterCount++;
+      if (delimitedSubstring[i] == delimiters.closing) closingDelimiterCount++;
+      if (openingDelimiterCount == closingDelimiterCount) {
+        substringEndingIndex = i;
+        break;
+      }
+    }
+    return delimitedSubstring.substring(1, substringEndingIndex);
+  }
+
+
+  /// If the number of opening delimiters isn't equal to the
+  /// amount of closing delimiters [NonMatchingDelimitersException]
+  /// is thrown because [MatchingDelimitersExtraction] relies
+  /// on the assumption that the parsed text has a complete and
+  /// finite set of matching delimiters.
+  /// ---
+  /// Example:
+  /// ```dart
+  /// String matching = "((hi) there)"
+  /// String nonMatching = "((hi) there"
+  /// StringExtractor.parsing(matching).extract(); // (hi) there
+  /// StringExtractor.parsing(nonMatching).extract(); // throws NonMatchingDelimitersException
+  /// ```
+  /// The second extraction throws the exception because
+  /// the `nonMatching` string has 2 opening delimiters (`(`)
+  /// but only 1 closing delimiter (`)`). Because the amount
+  void validateMatchingOf(String string, Delimiters delimiters) {
+    int openingDelimiterCount = string.counts(delimiters.opening);
+    int closingDelimiterCount = string.counts(delimiters.closing);
+
+    if (openingDelimiterCount != closingDelimiterCount)
+      throw UnmatchingDelimitersException(
+        delimiters,
+        openingDelimiterCount,
+        closingDelimiterCount,
+      );
+  }
+}
+
+/// When [ViseExtraction] is used by
+/// [StringExtractor] the delimiting area is defined
+/// as the area between the first occurrence of the
+/// first opening delimiter and the last occurrence
+/// of the closing delimiter.
+/// ---
+/// Example:
+/// Assuming that the delimiters are rounded brackets...
+/// ```dart
+/// "Hi (there)"  // returns -> "there"
+/// "((Hi)) there" // returns -> "(Hi)"
+/// "((Hi) there)" // returns -> "(Hi) There"
+/// "(Hi) (there)" // returns -> "Hi) (there"
+/// "((Hi there" // returns -> ""
+/// ```
+final class ViseExtraction extends Extraction {
+  const ViseExtraction();
+
+  String extract(String string, Delimiters delimiters) {
+    int firstOpeningDelimiterIndex = string.indexOf(delimiters.opening) + 1;
+    int lastClosingDelimiterIndex = string.lastIndexOf(delimiters.closing);
+
+    return (firstOpeningDelimiterIndex == -1 || lastClosingDelimiterIndex == -1)
+        ? ""
+        : string.substring(
+            firstOpeningDelimiterIndex, lastClosingDelimiterIndex);
+  }
+}
+
+
+class UnmatchingDelimitersException implements Exception {
+  Delimiters _delimiters;
+  int _openingDelimitersCount = 0;
+  int _closingDelimitersCount = 0;
+
+  UnmatchingDelimitersException(
+      this._delimiters,
+      this._openingDelimitersCount,
+      this._closingDelimitersCount,
+      );
+
+  @override
+  String toString() =>
+      "NonMatchingDelimitersException: non matching delimiters '${_delimiters.opening}' -> count: $_openingDelimitersCount, '${_delimiters.closing}' -> count: $_closingDelimitersCount";
 }
