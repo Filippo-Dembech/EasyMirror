@@ -1,5 +1,4 @@
 import '../delimiters.dart';
-import '../string_extractor.dart';
 
 class UnmatchingDelimitersException implements Exception {
   Delimiters _delimiters;
