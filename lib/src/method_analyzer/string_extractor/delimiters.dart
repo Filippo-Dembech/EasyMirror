@@ -23,6 +23,8 @@ enum Delimiters {
     Delimiters delimiters,
     String string,
   ) {
+    return AllMatchesIndexes.of(delimiters).findsFor(string);
+    /*
     List<MatchIndexes> result = [];
     for (int i = 0; i < string.length; i++) {
       if (string[i] == delimiters.opening) {
@@ -40,6 +42,7 @@ enum Delimiters {
       }
     }
     return result;
+    */
   }
 
   static countOperation(
@@ -60,3 +63,30 @@ enum Delimiters {
 }
 
 typedef MatchIndexes = (int, int);
+
+class AllMatchesIndexes {
+
+    List<MatchIndexes> _result = [];
+    Delimiters _delimiters;
+
+    AllMatchesIndexes.of(this._delimiters);
+
+    List<MatchIndexes> findsFor(String string) {
+    for (int i = 0; i < string.length; i++) {
+      if (string[i] == _delimiters.opening) {
+        int openingDelimitersCount = 0;
+        int closingDelimitersCount = 0;
+        for (int j = i; j < string.length; j++) {
+          if (string[j] == _delimiters.opening) openingDelimitersCount++;
+          if (string[j] == _delimiters.closing) closingDelimitersCount++;
+          if (openingDelimitersCount == closingDelimitersCount) {
+            _result.add((i, j));
+            break;
+          }
+          ;
+        }
+      }
+    }
+    return _result;
+    }
+}
