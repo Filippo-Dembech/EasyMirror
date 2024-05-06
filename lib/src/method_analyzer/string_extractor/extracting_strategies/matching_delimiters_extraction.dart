@@ -70,7 +70,7 @@ final class MatchingDelimitersExtraction extends Extraction {
     int closingDelimiterCount = string.counts(delimiters.closing);
 
     if (openingDelimiterCount != closingDelimiterCount)
-      throw NonMatchingDelimitersException(
+      throw UnmatchingDelimitersException(
         delimiters,
         openingDelimiterCount,
         closingDelimiterCount,

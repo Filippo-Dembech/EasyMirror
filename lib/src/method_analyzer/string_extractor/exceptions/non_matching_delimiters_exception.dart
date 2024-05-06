@@ -1,12 +1,12 @@
 import '../delimiters.dart';
 import '../string_extractor.dart';
 
-class NonMatchingDelimitersException implements Exception {
+class UnmatchingDelimitersException implements Exception {
   Delimiters _delimiters;
   int _openingDelimitersCount = 0;
   int _closingDelimitersCount = 0;
 
-  NonMatchingDelimitersException(
+  UnmatchingDelimitersException(
       this._delimiters,
       this._openingDelimitersCount,
       this._closingDelimitersCount,
