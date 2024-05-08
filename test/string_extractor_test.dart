@@ -45,13 +45,16 @@ void main() {
 
   test("nested extraction with MatchingDelimitersExtraction strategy", () {
     expect(StringExtractor.parsing("((hi)) there").extractsStringWithin(Delimiters.ROUND_BRACKETS), equals(["(hi)", "hi"]));
+    expect(StringExtractor.parsing("(((hi))) there").extractsStringWithin(Delimiters.ROUND_BRACKETS), equals(["((hi))", "(hi)", "hi"]));
+    expect(StringExtractor.parsing("(((hi))) (((there)))").extractsStringWithin(Delimiters.ROUND_BRACKETS), equals(["((hi))", "(hi)", "hi", "((there))", "(there)", "there"]));
+    expect(StringExtractor.parsing("(((hi)))(((there)))").extractsStringWithin(Delimiters.ROUND_BRACKETS), equals(["((hi))", "(hi)", "hi", "((there))", "(there)", "there"]));
     expect(StringExtractor.parsing("((hi) there)").extractsStringWithin(Delimiters.ROUND_BRACKETS), equals(["(hi) there", "hi"]));
   });
 
   test("nested extraction with ViseExtraction strategy", () {
-    //expect(StringExtractor.parsing("(hi) there").using(ViseExtraction()).extractsStringWithin(Delimiters.ROUND_BRACKETS), equals("hi"));
-    //expect(StringExtractor.parsing("(hi) there (mate)").using(ViseExtraction()).extractsStringWithin(Delimiters.ROUND_BRACKETS), equals("hi) there (mate"));
-    });
+    expect(StringExtractor.parsing("(hi) there").using(ViseExtraction()).extractsStringWithin(Delimiters.ROUND_BRACKETS), equals(["hi"]));
+    expect(StringExtractor.parsing("(hi) there (mate)").using(ViseExtraction()).extractsStringWithin(Delimiters.ROUND_BRACKETS), equals(["hi) there (mate"]));
+  });
 }
 
 
