@@ -1,5 +1,4 @@
 import 'package:easy_mirror/src/method_analyzer/extensions/list__empty_string_remover.dart';
-import 'package:easy_mirror/src/method_analyzer/extensions/string__char_count.dart';
 import 'delimiters.dart';
 
 /// Extracts substring delimited by defined delimiters

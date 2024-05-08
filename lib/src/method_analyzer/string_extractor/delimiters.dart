@@ -1,3 +1,5 @@
+import 'dart:async';
+
 enum Delimiters {
   ROUND_BRACKETS("(", ")"),
   SQUARED_BRACKETS("[", "]"),
@@ -65,13 +67,14 @@ enum Delimiters {
 typedef MatchIndexes = (int, int);
 
 class AllMatchesIndexes {
+  List<MatchIndexes> _result = [];
+  Delimiters _delimiters;
+  int closingIndex = 0;
 
-    List<MatchIndexes> _result = [];
-    Delimiters _delimiters;
+  AllMatchesIndexes.of(this._delimiters);
 
-    AllMatchesIndexes.of(this._delimiters);
-
-    List<MatchIndexes> findsFor(String string) {
+  // TODO: make it recursive
+  List<MatchIndexes> findsFor(String string) {
     for (int i = 0; i < string.length; i++) {
       if (string[i] == _delimiters.opening) {
         int openingDelimitersCount = 0;
@@ -88,5 +91,9 @@ class AllMatchesIndexes {
       }
     }
     return _result;
-    }
+  }
+}
+
+void main() {
+  print(Delimiters.allMatchesIndexes(Delimiters.ROUND_BRACKETS, "(())"));
 }
