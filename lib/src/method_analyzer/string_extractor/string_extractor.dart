@@ -8,7 +8,7 @@ import 'delimiters.dart';
 /// the used strategy the extracted substring may vary.
 class StringExtractor {
   String _text = "";
-  Extraction _extractionStrategy = MatchingDelimitersExtraction();
+  Extraction _extractionStrategy = PluckExtraction();
 
   StringExtractor();
 
@@ -20,21 +20,6 @@ class StringExtractor {
     this._text,
   );
 
-  // ! DEPRECATED
-  /// Defines the [text] parsed by the [StringExtractor]
-  // StringExtractor parsing(String text) {
-  //   _text = text;
-  //  return this;
-  // }
-
-  // ! DEPRECATED
-  /// Defines the [Delimiters] used to parse this
-  /// text.
-  // StringExtractor within(Delimiters delimiters) {
-  //   _delimiters = delimiters;
-  //   return this;
-  // }
-
   /// Defines the [Extraction] strategy used to
   /// define the delimiting area.
   StringExtractor using(Extraction extraction) {
@@ -42,31 +27,31 @@ class StringExtractor {
     return this;
   }
 
-  // ! DEPRECATED
-  /// Extracts the substrings of the passed text within the
-  /// [Delimiters] defined with the [StringExtractor.within] method.
-  /// The way the delimiting area is computed depends on the
+
+  /// Extracts the first substring of the passed text within the passed
+  /// [Delimiters]. The way the delimiting area is computed depends on the
   /// [Extraction] strategy that has been defined
-  /// with the [StringExtractor.using] method - [MatchingDelimitersExtraction] by default.
+  /// with the [StringExtractor.using] method - [PluckExtraction] by default.
   /// Check [Extractions] class to check all the available
-  /// strategies. [Delimiters] are [Delimiters.ROUND_BRACKETS] by default.
-  // String extracts() => _extractionStrategy.extract(_text, _delimiters);
+  /// strategies.
+  String extractsFirstStringWithin(Delimiters delimiters) {
+      return _extractionStrategy.extract(_text, delimiters)[0];
+  }
 
   /// Extracts the substrings of the passed text within the passed
   /// [Delimiters]. The way the delimiting area is computed depends on the
   /// [Extraction] strategy that has been defined
-  /// with the [StringExtractor.using] method - [MatchingDelimitersExtraction] by default.
+  /// with the [StringExtractor.using] method - [PluckExtraction] by default.
   /// Check [Extractions] class to check all the available
   /// strategies.
   List<String> extractsStringWithin(Delimiters delimiters) {
-      return _extractionStrategy.extract(_text, delimiters); // TODO: remove index [0]
+      return _extractionStrategy.extract(_text, delimiters);
   }
 }
 
 class Extractions {
   static Extraction viseExtraction() => ViseExtraction();
-  static Extraction matchingDelimitersExtraction() =>
-      MatchingDelimitersExtraction();
+  static Extraction pluckExtraction() => PluckExtraction();
 }
 
 /// Define the algorithm that the [StringExtractor]
@@ -77,7 +62,7 @@ abstract class Extraction {
   List<String> extract(String string, Delimiters delimiters);
 }
 
-/// When [MatchingDelimitersExtraction] is used by
+/// When [PluckExtraction] is used by
 /// [StringExtractor] the delimiting area is defined
 /// as the first area of the parsed text where
 /// the amount of opening delimiters is equal to the
@@ -92,8 +77,8 @@ abstract class Extraction {
 /// "(Hi) (there)" // returns -> "Hi"
 /// "((Hi there" // throws NonMatchingDelimitersException
 /// ```
-final class MatchingDelimitersExtraction extends Extraction {
-  const MatchingDelimitersExtraction();
+final class PluckExtraction extends Extraction {
+  const PluckExtraction();
 
   @override
   List<String> extract(String string, Delimiters delimiters) {
@@ -137,6 +122,7 @@ final class ViseExtraction extends Extraction {
   }
 }
 
+/*
 class UnmatchingDelimitersException implements Exception {
   Delimiters _delimiters;
   int _openingDelimitersCount = 0;
@@ -152,3 +138,5 @@ class UnmatchingDelimitersException implements Exception {
   String toString() =>
       "NonMatchingDelimitersException: non matching delimiters '${_delimiters.opening}' -> count: $_openingDelimitersCount, '${_delimiters.closing}' -> count: $_closingDelimitersCount";
 }
+
+*/
