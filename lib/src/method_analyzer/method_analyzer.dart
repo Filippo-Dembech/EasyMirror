@@ -35,7 +35,7 @@ class MethodAnalyzer {
     String leftTrimSource =
         source.substring(methodNameIndex + methodName.length);
     return StringExtractor.parsing(leftTrimSource)
-        .extractsStringWithin(Delimiters.ROUND_BRACKETS)
+        .extractsFirstStringWithin(Delimiters.ROUND_BRACKETS)
         .withoutWhiteSpaces();
   }
 
@@ -121,7 +121,7 @@ class MethodAnalyzer {
   List<String> _getParametersEnclosedIn(Delimiters delimiters) {
     String parameters =
         StringExtractor.parsing(_parametersDeclarationWithoutSpaces)
-            .extractsStringWithin(delimiters);
+            .extractsFirstStringWithin(delimiters);
     return _splitParameters(parameters).withoutEmptyStrings();
   }
 
