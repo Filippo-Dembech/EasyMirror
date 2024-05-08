@@ -1,5 +1,3 @@
-import 'dart:async';
-
 enum Delimiters {
   ROUND_BRACKETS("(", ")"),
   SQUARED_BRACKETS("[", "]"),
