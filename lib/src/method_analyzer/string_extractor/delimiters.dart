@@ -127,8 +127,11 @@ enum Delimiters {
     f(delimiters, openingCount, closingCount);
   }
 
+  /// Checks whether the passed [string] is one of
+  /// these [Delimiters].
   bool contains(String string) => opening == string || closing == string;
 
+  /// Converts these [Delimiters] into a [String]
   String toString() => "'$opening', '$closing'";
 }
 
