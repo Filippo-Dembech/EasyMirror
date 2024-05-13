@@ -35,7 +35,9 @@ class StringExtractor {
   /// Check [Extractions] class to check all the available
   /// strategies.
   String extractsFirstStringWithin(Delimiters delimiters) {
-      return _extractionStrategy.extract(_text, delimiters)[0];
+    List<String> extractedList = _extractionStrategy.extract(_text, delimiters);
+    if (extractedList.isEmpty) return "";
+    return extractedList[0];
   }
 
   /// Extracts the substrings of the passed text within the passed
