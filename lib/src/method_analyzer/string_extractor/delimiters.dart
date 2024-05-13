@@ -16,11 +16,11 @@ enum Delimiters {
   const Delimiters(this.opening, this.closing);
 
   /// Checks whether the given [string] is an opening delimiter.
-  /// 
+  ///
   /// It checks the passed [string] against all the available
   /// [Delimiters] pairs, if any of them has got the passed
   /// [string] as opening delimiters, true is returned.
-  /// 
+  ///
   /// For Example:
   /// ```dart
   /// Delimiters.isOpeningDelimiter("(") // true
@@ -32,11 +32,11 @@ enum Delimiters {
       Delimiters.values.any((delimiters) => delimiters.opening == string);
 
   /// Checks whether the given [string] is a closing delimiter.
-  /// 
+  ///
   /// It checks the passed [string] against all the available
   /// [Delimiters] pairs, if any of them has got the passed
   /// [string] as closing delimiters, true is returned.
-  /// 
+  ///
   /// For Example:
   /// ```dart
   /// Delimiters.isOpeningDelimiter(")") // true
@@ -49,12 +49,12 @@ enum Delimiters {
 
   /// Returns the [Delimiters] pair instance which has got
   /// the passed [string] as opening or closing delimiter.
-  /// 
+  ///
   /// It checks whether the given [string] matches any of
   /// the opening or closing delimiters of all the available
   /// [Delimiters] pairs, if a match is found then the
   /// [Delimiters] pair that contains the match is returned.
-  /// 
+  ///
   /// For Example:
   /// ```dart
   /// Delimiters.of("(") // returns 'Delimiters.ROUND_BRACKETS'
@@ -62,14 +62,13 @@ enum Delimiters {
   /// Delimiters.of("()") // returns 'null'
   /// Delimiters.of("a") // returns 'null'
   /// ```
-  static Delimiters? of(String string) =>
-      Delimiters.values.firstWhereOrNull((delimiters) => delimiters.contains(string));
+  static Delimiters? of(String string) => Delimiters.values
+      .firstWhereOrNull((delimiters) => delimiters.contains(string));
 
-  
   /// Returns a list of record pairs of the starting
   /// index and the closing index of the [delimiters]
   /// in the given [string].
-  /// 
+  ///
   /// A string could contain more than one pair of
   /// delimiters or just delimiters (opening or closing)
   /// without their matching opening or closing delimiter.
@@ -78,7 +77,7 @@ enum Delimiters {
   /// of indexes that represent the starting and the closing
   /// indexes of a specified delimiters pair. Only 'complete'
   /// /'matching' delimiters are considered.
-  /// 
+  ///
   /// For Example (in the example the parameter 'delimiters'
   /// is supposed to be Delimiters.ROUND_BRACKETS):
   /// ```dart
@@ -97,24 +96,45 @@ enum Delimiters {
   /// allMatchesIndex.(..., "((a)") // returns [(1,3)]
   /// allMatchesIndex.(..., "(a)))") // returns [(0,2)]
   /// ```
-  static List<MatchIndexes> allMatchesIndexes( // TODO: refactor
+  static List<MatchIndexes> allMatchesIndexes(
     Delimiters delimiters,
     String string,
   ) {
-    return AllMatchesIndexes.of(delimiters).findsFor(string);
+    return AllMatchesIndexes
+              .of(delimiters)
+              .findsFor(string);
   }
 
   /// Executes the given function over the current delimiters
   /// giving the ability to count the number of occurrences
   /// of the opening or closing delimiters.
-  /// 
+  ///
   /// This method could be used to have total control
   /// over how matching delimiters are calculated.
   /// By using the 'openingCount' and 'closingCount'
   /// parameters with some conditional logic you can
   /// decide what defines delimiters to match and what
   /// doesn't.
-  // TODO: write examples
+  ///
+  /// For example, check whether in a string there are
+  /// matching delimiters or not:
+  /// ```dart
+  ///
+  /// String string = "(hi there) from delimiters"
+  /// bool result = false
+  ///
+  /// Delimiters.ROUND_BRACKETS.countOperation((
+  ///     delimiters,
+  ///     openingCount,
+  ///     closingCount,
+  ///  ) {
+  ///     for (int i = 0; i < string.length; i++) {
+  ///       if (string[i] == delimiters.opening) openingCount++;
+  ///       if (string[i] == delimiters.closing) closingCount++;
+  ///       if (openingCount == closingCount) result = true;
+  ///     }
+  ///  });
+  /// ```
   void countOperation(
       Function(
         Delimiters delimiters,
@@ -128,21 +148,43 @@ enum Delimiters {
 
   /// Checks whether the passed [string] is one of
   /// these [Delimiters].
+  ///
+  /// For Example:
+  /// ```dart
+  /// Delimiters.ROUND_BRACKETS.contains("(") // true
+  /// Delimiters.ROUND_BRACKETS.contains(")") // true
+  /// Delimiters.ROUND_BRACKETS.contains("(()") // false
+  /// Delimiters.ROUND_BRACKETS.contains("[") // false
+  /// Delimiters.ROUND_BRACKETS.contains("a") // false
+  /// ```
   bool contains(String string) => opening == string || closing == string;
 
   /// Converts these [Delimiters] into a [String]
   String toString() => "'$opening', '$closing'";
 }
 
-typedef MatchIndexes = (int, int);
+/// A record defining [Delimiters] matching indexes
+/// `(opening_delimiter_index, closing_delimiter_index)`;
+typedef MatchIndexes = (int, int); // TODO: rename IndexesMatch
 
+/// An object method that stores the algorithm to find
+/// all the [MatchIndexes] of a [Delimiters] pair within
+/// a string.
 class AllMatchesIndexes {
+  /// A list to store all the [MatchIndexes] that
+  /// will be return as result of the computation.
   List<MatchIndexes> _result = [];
-  Delimiters _delimiters;
-  int closingIndex = 0;
 
+  /// The [Delimiters] the algorithm has to find the
+  /// matching indexes of.
+  Delimiters _delimiters;
+
+  /// Creates an instance of the [AllMatchesIndexes]
+  /// algorithm upon the passed [Delimiters].
   AllMatchesIndexes.of(this._delimiters);
 
+  /// computes the list of [MatchIndexes] depending
+  /// on the passed parameters of the algorithm.
   // TODO: make it recursive
   List<MatchIndexes> findsFor(String string) {
     for (int i = 0; i < string.length; i++) {
