@@ -90,6 +90,7 @@ class JumpingIterator {
       openingCount,
       closingCount,
     ) {
+      openingCount = 1;
       for (int i = _currentIndex + 2; i < _string.length; i++) {
         if (_string[i] == delimiters.opening) openingCount++;
         if (_string[i] == delimiters.closing) closingCount++;
@@ -107,6 +108,7 @@ class JumpingIterator {
       openingCount,
       closingCount,
     ) {
+      openingCount = 1;
       while (openingCount != closingCount) {
         if (_string[_currentIndex + 2] == delimiters.opening) openingCount++;
         if (_string[_currentIndex + 2] == delimiters.closing) closingCount++;

@@ -115,13 +115,13 @@ enum Delimiters {
   /// decide what defines delimiters to match and what
   /// doesn't.
   // TODO: write examples
-  void countOperation(  // TODO: make it void and used with .of() method
+  void countOperation(
       Function(
         Delimiters delimiters,
         int openingCount,
         int closingCount,
       ) f) {
-    int openingCount = 1; // TODO: openingCount should be initialized to 0
+    int openingCount = 0;
     int closingCount = 0;
     f(this, openingCount, closingCount);
   }
