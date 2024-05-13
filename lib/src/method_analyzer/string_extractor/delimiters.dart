@@ -115,8 +115,7 @@ enum Delimiters {
   /// decide what defines delimiters to match and what
   /// doesn't.
   // TODO: write examples
-  static countOperation(  // TODO: make it void and used with .of() method
-      Delimiters delimiters,
+  void countOperation(  // TODO: make it void and used with .of() method
       Function(
         Delimiters delimiters,
         int openingCount,
@@ -124,7 +123,7 @@ enum Delimiters {
       ) f) {
     int openingCount = 1; // TODO: openingCount should be initialized to 0
     int closingCount = 0;
-    f(delimiters, openingCount, closingCount);
+    f(this, openingCount, closingCount);
   }
 
   /// Checks whether the passed [string] is one of

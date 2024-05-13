@@ -85,7 +85,7 @@ class JumpingIterator {
 
     bool result = false;
 
-    Delimiters.countOperation(Delimiters.of(_followingChar)!, (
+    Delimiters.of(_followingChar)!.countOperation((
       delimiters,
       openingCount,
       closingCount,
@@ -102,7 +102,7 @@ class JumpingIterator {
 
   /// Moves the iterator at the end of the current delimited area.
   void _jumpDelimitedArea() {
-    Delimiters.countOperation(Delimiters.of(_followingChar)!, (
+    Delimiters.of(_followingChar)!.countOperation((
       delimiters,
       openingCount,
       closingCount,
