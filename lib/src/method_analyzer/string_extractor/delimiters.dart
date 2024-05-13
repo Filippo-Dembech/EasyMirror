@@ -1,22 +1,68 @@
+import 'package:collection/collection.dart';
+
 enum Delimiters {
   ROUND_BRACKETS("(", ")"),
   SQUARED_BRACKETS("[", "]"),
   CURLY_BRACKETS("{", "}"),
   DIAMOND_BRACKETS("<", ">");
 
+  /// The opening delimiter of the [Delimiters] pair.
   final String opening;
+
+  /// The closing delimiter or the [Delimiters] pair.
   final String closing;
 
+  /// Create an instance of [Delimiters] pair.
   const Delimiters(this.opening, this.closing);
 
+  /// Checks whether the given [string] is an opening delimiter.
+  /// 
+  /// It checks the passed [string] against all the available
+  /// [Delimiters] pairs, if any of them has got the passed
+  /// [string] as opening delimiters, true is returned.
+  /// 
+  /// For Example:
+  /// ```
+  /// Delimiters.isOpeningDelimiter("(") // true
+  /// Delimiters.isOpeningDelimiter("[") // true
+  /// Delimiters.isOpeningDelimiter(")") // false
+  /// Delimiters.isOpeningDelimiter("b") // false
+  /// ```
   static bool isOpeningDelimiter(String string) =>
       Delimiters.values.any((delimiters) => delimiters.opening == string);
 
+  /// Checks whether the given [string] is a closing delimiter.
+  /// 
+  /// It checks the passed [string] against all the available
+  /// [Delimiters] pairs, if any of them has got the passed
+  /// [string] as closing delimiters, true is returned.
+  /// 
+  /// For Example:
+  /// ```
+  /// Delimiters.isOpeningDelimiter(")") // true
+  /// Delimiters.isOpeningDelimiter("]") // true
+  /// Delimiters.isOpeningDelimiter("(") // false
+  /// Delimiters.isOpeningDelimiter("b") // false
   static bool isClosingDelimiter(String string) =>
       Delimiters.values.any((delimiters) => delimiters.closing == string);
 
-  static Delimiters of(String string) =>
-      Delimiters.values.firstWhere((delimiters) => delimiters.contains(string));
+  /// Returns the [Delimiters] pair instance which has got
+  /// the passed [string] as opening or closing delimiter.
+  /// 
+  /// It checks whether the given [string] matches any of
+  /// the opening or closing delimiters of all the available
+  /// [Delimiters] pairs, if a match is found then the
+  /// [Delimiters] pair that contains the match is returned.
+  /// 
+  /// For Example:
+  /// ```
+  /// Delimiters.of("(") // returns 'Delimiters.ROUND_BRACKETS'
+  /// Delimiters.of("[") // returns 'Delimiters.SQUARED_BRACKETS'
+  /// Delimiters.of("()") // returns 'null'
+  /// Delimiters.of("a") // returns 'null'
+  /// ```
+  static Delimiters? of(String string) =>
+      Delimiters.values.firstWhereOrNull((delimiters) => delimiters.contains(string));
 
   // TODO: refactor
   static List<MatchIndexes> allMatchesIndexes(
@@ -71,4 +117,9 @@ class AllMatchesIndexes {
     }
     return _result;
   }
+}
+
+void main() {
+  print("delimiters of --> ${Delimiters.of("A")}");
+  print("delimiters of --> ${Delimiters.of("()")}");
 }
