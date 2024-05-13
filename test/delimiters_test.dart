@@ -43,6 +43,10 @@ void main() {
     expect(Delimiters.of("["), equals(Delimiters.SQUARED_BRACKETS));
     expect(Delimiters.of("{"), equals(Delimiters.CURLY_BRACKETS));
     expect(Delimiters.of("<"), equals(Delimiters.DIAMOND_BRACKETS));
+
+    expect(Delimiters.of("()"), isNull);
+    expect(Delimiters.of("a"), isNull);
+
   });
 
   test("allMatches without text", () {
