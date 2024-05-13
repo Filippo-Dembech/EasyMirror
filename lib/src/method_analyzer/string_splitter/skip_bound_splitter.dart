@@ -3,13 +3,18 @@ import '../string_extractor/delimiters.dart';
 import 'string_chopper.dart';
 import 'jumping_iterator.dart';
 
-class SkippingStringSplitter {
+class SkipBoundSplitter {
   final String _string;
   final String separator;
   final JumpingIterator _iterator;
 
-  SkippingStringSplitter(this._string, {required this.separator})
-      : _iterator = JumpingIterator(_string, delimitersSet: {}) {
+  SkipBoundSplitter(
+    this._string, {
+    required this.separator,
+  }) : _iterator = JumpingIterator(
+          _string,
+          delimitersSet: {},
+        ) {
     if (separator.length > 1)
       throw InvalidSeparatorException(
           "'$separator' isn't a valid separator. A separator can't be more than one character long.");
@@ -23,9 +28,6 @@ class SkippingStringSplitter {
 
   List<int> _findsIndexesOfSeparator() {
     final result = <int>[];
-    // ! When 'next' is called in the '.forEach()' the index shift
-    // ! by one, so the index within the '.forEach()' doesn't refer
-    // ! to the current character.
     _iterator.forEach((char, index) {
       if (char == separator) result.add(index);
     });

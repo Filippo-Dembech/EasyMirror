@@ -1,58 +1,59 @@
 import 'package:easy_mirror/easy_mirror.dart';
+import 'package:easy_mirror/src/method_analyzer/string_splitter/skip_bound_splitter.dart';
 import 'package:test/test.dart';
 
 void main() {
   test("invalid separator", () {
-    expect(() => SkippingStringSplitter("", separator: "ab"), throwsA(isA<InvalidSeparatorException>()));
-    expect(() => SkippingStringSplitter("", separator: "abc"), throwsA(isA<InvalidSeparatorException>()));
-    expect(() => SkippingStringSplitter("abc", separator: "ab"), throwsA(isA<InvalidSeparatorException>()));
-    expect(() => SkippingStringSplitter("abcd", separator: "abc"), throwsA(isA<InvalidSeparatorException>()));
+    expect(() => SkipBoundSplitter("", separator: "ab"), throwsA(isA<InvalidSeparatorException>()));
+    expect(() => SkipBoundSplitter("", separator: "abc"), throwsA(isA<InvalidSeparatorException>()));
+    expect(() => SkipBoundSplitter("abc", separator: "ab"), throwsA(isA<InvalidSeparatorException>()));
+    expect(() => SkipBoundSplitter("abcd", separator: "abc"), throwsA(isA<InvalidSeparatorException>()));
   });
 
   test("edge cases", () {
-    expect(SkippingStringSplitter("", separator: "").splits(), equals([]));
-    expect(SkippingStringSplitter("", separator: ",").splits(), equals([]));
-    expect(SkippingStringSplitter("a", separator: ",").splits(), equals(["a"]));
-    expect(SkippingStringSplitter(",", separator: ",").splits(), equals([]));
-    expect(SkippingStringSplitter(",,,", separator: ",").splits(), equals([]));
-    expect(SkippingStringSplitter(",a,", separator: ",").splits(), equals(["a"]));
-    expect(SkippingStringSplitter(",a", separator: ",").splits(), equals(["a"]));
-    expect(SkippingStringSplitter("a,", separator: ",").splits(), equals(["a"]));
-    expect(SkippingStringSplitter(",a,b,", separator: ",").splits(), equals(["a", "b"]));
-    expect(SkippingStringSplitter("a,b,", separator: ",").splits(), equals(["a", "b"]));
-    expect(SkippingStringSplitter(",a,b", separator: ",").splits(), equals(["a", "b"]));
-    expect(SkippingStringSplitter(",ab,", separator: ",").splits(), equals(["ab"]));
+    expect(SkipBoundSplitter("", separator: "").splits(), equals([]));
+    expect(SkipBoundSplitter("", separator: ",").splits(), equals([]));
+    expect(SkipBoundSplitter("a", separator: ",").splits(), equals(["a"]));
+    expect(SkipBoundSplitter(",", separator: ",").splits(), equals([]));
+    expect(SkipBoundSplitter(",,,", separator: ",").splits(), equals([]));
+    expect(SkipBoundSplitter(",a,", separator: ",").splits(), equals(["a"]));
+    expect(SkipBoundSplitter(",a", separator: ",").splits(), equals(["a"]));
+    expect(SkipBoundSplitter("a,", separator: ",").splits(), equals(["a"]));
+    expect(SkipBoundSplitter(",a,b,", separator: ",").splits(), equals(["a", "b"]));
+    expect(SkipBoundSplitter("a,b,", separator: ",").splits(), equals(["a", "b"]));
+    expect(SkipBoundSplitter(",a,b", separator: ",").splits(), equals(["a", "b"]));
+    expect(SkipBoundSplitter(",ab,", separator: ",").splits(), equals(["ab"]));
 
 
-    expect(SkippingStringSplitter("", separator: "").splits(), equals([]));
-    expect(SkippingStringSplitter("", separator: ";").splits(), equals([]));
-    expect(SkippingStringSplitter("a", separator: ";").splits(), equals(["a"]));
-    expect(SkippingStringSplitter(";", separator: ";").splits(), equals([]));
-    expect(SkippingStringSplitter(";;;", separator: ";").splits(), equals([]));
-    expect(SkippingStringSplitter(";a;", separator: ";").splits(), equals(["a"]));
-    expect(SkippingStringSplitter(";a", separator: ";").splits(), equals(["a"]));
-    expect(SkippingStringSplitter("a;", separator: ";").splits(), equals(["a"]));
-    expect(SkippingStringSplitter(";a;b;", separator: ";").splits(), equals(["a", "b"]));
-    expect(SkippingStringSplitter("a;b;", separator: ";").splits(), equals(["a", "b"]));
-    expect(SkippingStringSplitter(";a;b", separator: ";").splits(), equals(["a", "b"]));
-    expect(SkippingStringSplitter(";ab;", separator: ";").splits(), equals(["ab"]));
+    expect(SkipBoundSplitter("", separator: "").splits(), equals([]));
+    expect(SkipBoundSplitter("", separator: ";").splits(), equals([]));
+    expect(SkipBoundSplitter("a", separator: ";").splits(), equals(["a"]));
+    expect(SkipBoundSplitter(";", separator: ";").splits(), equals([]));
+    expect(SkipBoundSplitter(";;;", separator: ";").splits(), equals([]));
+    expect(SkipBoundSplitter(";a;", separator: ";").splits(), equals(["a"]));
+    expect(SkipBoundSplitter(";a", separator: ";").splits(), equals(["a"]));
+    expect(SkipBoundSplitter("a;", separator: ";").splits(), equals(["a"]));
+    expect(SkipBoundSplitter(";a;b;", separator: ";").splits(), equals(["a", "b"]));
+    expect(SkipBoundSplitter("a;b;", separator: ";").splits(), equals(["a", "b"]));
+    expect(SkipBoundSplitter(";a;b", separator: ";").splits(), equals(["a", "b"]));
+    expect(SkipBoundSplitter(";ab;", separator: ";").splits(), equals(["ab"]));
   });
 
   test("no delimiters", () {
-    expect(SkippingStringSplitter("a,b", separator: ",").splits(), equals(["a", "b"]));
-    expect(SkippingStringSplitter("a,b,c", separator: ",").splits(), equals(["a", "b", "c"]));
-    expect(SkippingStringSplitter("ab,cd", separator: ",").splits(), equals(["ab", "cd"]));
-    expect(SkippingStringSplitter("ab,cd,ef", separator: ",").splits(), equals(["ab", "cd", "ef"]));
+    expect(SkipBoundSplitter("a,b", separator: ",").splits(), equals(["a", "b"]));
+    expect(SkipBoundSplitter("a,b,c", separator: ",").splits(), equals(["a", "b", "c"]));
+    expect(SkipBoundSplitter("ab,cd", separator: ",").splits(), equals(["ab", "cd"]));
+    expect(SkipBoundSplitter("ab,cd,ef", separator: ",").splits(), equals(["ab", "cd", "ef"]));
 
-    expect(SkippingStringSplitter("a;b", separator: ";").splits(), equals(["a", "b"]));
-    expect(SkippingStringSplitter("a;b;c", separator: ";").splits(), equals(["a", "b", "c"]));
-    expect(SkippingStringSplitter("ab;cd", separator: ";").splits(), equals(["ab", "cd"]));
-    expect(SkippingStringSplitter("ab;cd;ef", separator: ";").splits(), equals(["ab", "cd", "ef"]));
+    expect(SkipBoundSplitter("a;b", separator: ";").splits(), equals(["a", "b"]));
+    expect(SkipBoundSplitter("a;b;c", separator: ";").splits(), equals(["a", "b", "c"]));
+    expect(SkipBoundSplitter("ab;cd", separator: ";").splits(), equals(["ab", "cd"]));
+    expect(SkipBoundSplitter("ab;cd;ef", separator: ";").splits(), equals(["ab", "cd", "ef"]));
 
 
-    expect(SkippingStringSplitter("abc", separator: "a").splits(), equals(["bc"]));
-    expect(SkippingStringSplitter("abc", separator: "b").splits(), equals(["a", "c"]));
-    expect(SkippingStringSplitter("abc", separator: "c").splits(), equals(["ab"]));
+    expect(SkipBoundSplitter("abc", separator: "a").splits(), equals(["bc"]));
+    expect(SkipBoundSplitter("abc", separator: "b").splits(), equals(["a", "c"]));
+    expect(SkipBoundSplitter("abc", separator: "c").splits(), equals(["ab"]));
   });
 
   test("with matching delimiters", () {
@@ -156,7 +157,7 @@ List<String> splitRound({
   required String separator,
   Set<Delimiters> delimiters = const {Delimiters.ROUND_BRACKETS},
 }) {
-  final splitter = SkippingStringSplitter(string, separator: separator)..ignoringSeparatorsWithin(delimiters);
+  final splitter = SkipBoundSplitter(string, separator: separator)..ignoringSeparatorsWithin(delimiters);
   return splitter.splits();
 }
 
@@ -165,7 +166,7 @@ List<String> splitSquared({
   required String separator,
   Set<Delimiters> delimiters = const {Delimiters.SQUARED_BRACKETS},
 }) {
-  final splitter = SkippingStringSplitter(string, separator: separator)..ignoringSeparatorsWithin(delimiters);
+  final splitter = SkipBoundSplitter(string, separator: separator)..ignoringSeparatorsWithin(delimiters);
   return splitter.splits();
 }
 
@@ -174,7 +175,7 @@ List<String> splitCurly({
   required String separator,
   Set<Delimiters> delimiters = const {Delimiters.CURLY_BRACKETS},
 }) {
-  final splitter = SkippingStringSplitter(string, separator: separator)..ignoringSeparatorsWithin(delimiters);
+  final splitter = SkipBoundSplitter(string, separator: separator)..ignoringSeparatorsWithin(delimiters);
   return splitter.splits();
 }
 
@@ -183,6 +184,6 @@ List<String> splitDiamond({
   required String separator,
   Set<Delimiters> delimiters = const {Delimiters.DIAMOND_BRACKETS},
 }) {
-  final splitter = SkippingStringSplitter(string, separator: separator)..ignoringSeparatorsWithin(delimiters);
+  final splitter = SkipBoundSplitter(string, separator: separator)..ignoringSeparatorsWithin(delimiters);
   return splitter.splits();
 }
