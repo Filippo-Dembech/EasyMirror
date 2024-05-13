@@ -96,7 +96,7 @@ enum Delimiters {
   /// allMatchesIndex.(..., "((a)") // returns [(1,3)]
   /// allMatchesIndex.(..., "(a)))") // returns [(0,2)]
   /// ```
-  static List<MatchIndexes> allMatchesIndexes(
+  static List<IndexesMatch> allMatchesIndexes(
     Delimiters delimiters,
     String string,
   ) {
@@ -165,7 +165,7 @@ enum Delimiters {
 
 /// A record defining [Delimiters] matching indexes
 /// `(opening_delimiter_index, closing_delimiter_index)`;
-typedef MatchIndexes = (int, int); // TODO: rename IndexesMatch
+typedef IndexesMatch = (int, int); // TODO: rename IndexesMatch
 
 /// An object method that stores the algorithm to find
 /// all the [MatchIndexes] of a [Delimiters] pair within
@@ -173,7 +173,7 @@ typedef MatchIndexes = (int, int); // TODO: rename IndexesMatch
 class AllMatchesIndexes {
   /// A list to store all the [MatchIndexes] that
   /// will be return as result of the computation.
-  List<MatchIndexes> _result = [];
+  List<IndexesMatch> _result = [];
 
   /// The [Delimiters] the algorithm has to find the
   /// matching indexes of.
@@ -186,7 +186,7 @@ class AllMatchesIndexes {
   /// computes the list of [MatchIndexes] depending
   /// on the passed parameters of the algorithm.
   // TODO: make it recursive
-  List<MatchIndexes> findsFor(String string) {
+  List<IndexesMatch> findsFor(String string) {
     for (int i = 0; i < string.length; i++) {
       if (string[i] == _delimiters.opening) {
         int openingDelimitersCount = 0;
