@@ -50,5 +50,34 @@ class Parameter {
   }) : isOptional = !isRequired;
 
   @override
+  bool operator ==(Object other) => 
+    identical(this, other) ||
+    other is Parameter &&
+    runtimeType == other.runtimeType &&
+    name == other.name &&
+    dataType == other.dataType &&
+    type == other.type &&
+    isPositional == other.isPositional &&
+    isOptionalPositional == other.isOptionalPositional &&
+    isNamed == other.isNamed &&
+    isRequired == other.isRequired &&
+    hasDefaultValue == other.hasDefaultValue &&
+    defaultValue == other.defaultValue &&
+    isNullable == other.isNullable;
+
+  @override
+  int get hashCode =>
+    name.hashCode ^
+    dataType.hashCode ^
+    type.hashCode ^
+    isPositional.hashCode ^
+    isOptionalPositional.hashCode ^
+    isNamed.hashCode ^
+    isRequired.hashCode ^
+    hasDefaultValue.hashCode ^
+    defaultValue.hashCode ^
+    isNullable.hashCode;
+
+  @override
   String toString() => "(#${type.value}# ${(isNamed && isRequired) ? "required " : ""}$dataType $name${defaultValue ?? ""})";
 }
