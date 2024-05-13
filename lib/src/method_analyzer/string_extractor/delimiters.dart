@@ -22,7 +22,7 @@ enum Delimiters {
   /// [string] as opening delimiters, true is returned.
   /// 
   /// For Example:
-  /// ```
+  /// ```dart
   /// Delimiters.isOpeningDelimiter("(") // true
   /// Delimiters.isOpeningDelimiter("[") // true
   /// Delimiters.isOpeningDelimiter(")") // false
@@ -38,11 +38,12 @@ enum Delimiters {
   /// [string] as closing delimiters, true is returned.
   /// 
   /// For Example:
-  /// ```
+  /// ```dart
   /// Delimiters.isOpeningDelimiter(")") // true
   /// Delimiters.isOpeningDelimiter("]") // true
   /// Delimiters.isOpeningDelimiter("(") // false
   /// Delimiters.isOpeningDelimiter("b") // false
+  /// ```
   static bool isClosingDelimiter(String string) =>
       Delimiters.values.any((delimiters) => delimiters.closing == string);
 
@@ -55,7 +56,7 @@ enum Delimiters {
   /// [Delimiters] pair that contains the match is returned.
   /// 
   /// For Example:
-  /// ```
+  /// ```dart
   /// Delimiters.of("(") // returns 'Delimiters.ROUND_BRACKETS'
   /// Delimiters.of("[") // returns 'Delimiters.SQUARED_BRACKETS'
   /// Delimiters.of("()") // returns 'null'
@@ -64,22 +65,64 @@ enum Delimiters {
   static Delimiters? of(String string) =>
       Delimiters.values.firstWhereOrNull((delimiters) => delimiters.contains(string));
 
-  // TODO: refactor
-  static List<MatchIndexes> allMatchesIndexes(
+  
+  /// Returns a list of record pairs of the starting
+  /// index and the closing index of the [delimiters]
+  /// in the given [string].
+  /// 
+  /// A string could contain more than one pair of
+  /// delimiters or just delimiters (opening or closing)
+  /// without their matching opening or closing delimiter.
+  /// To understand how many 'complete' delimiter pair are
+  /// present within a string this method returns a list
+  /// of indexes that represent the starting and the closing
+  /// indexes of a specified delimiters pair. Only 'complete'
+  /// /'matching' delimiters are considered.
+  /// 
+  /// For Example (in the example the parameter 'delimiters'
+  /// is supposed to be Delimiters.ROUND_BRACKETS):
+  /// ```dart
+  /// allMatchesIndex.(..., "") // returns []
+  /// allMatchesIndex.(..., "()()") // returns [(0,1), (2,3)]
+  /// allMatchesIndex.(..., "(())") // returns [(0,3), (1,2)]
+  /// allMatchesIndex.(..., "a") // returns []
+  /// allMatchesIndex.(..., "(a)") // returns [(0,2)]
+  /// allMatchesIndex.(..., "(a)(b)") // returns [(0,2), (3,5)]
+  /// allMatchesIndex.(..., "((a))") // returns [(0,4), (1,3)]
+  /// allMatchesIndex.(..., "((a)(b))") // returns [(0,7), (1,3), (4,6)]
+  /// allMatchesIndex.(..., "(") // returns []
+  /// allMatchesIndex.(..., "(a") // returns []
+  /// allMatchesIndex.(..., "(()") // returns [(1,2)]
+  /// allMatchesIndex.(..., "()))") // returns [(0,1)]
+  /// allMatchesIndex.(..., "((a)") // returns [(1,3)]
+  /// allMatchesIndex.(..., "(a)))") // returns [(0,2)]
+  /// ```
+  static List<MatchIndexes> allMatchesIndexes( // TODO: refactor
     Delimiters delimiters,
     String string,
   ) {
     return AllMatchesIndexes.of(delimiters).findsFor(string);
   }
 
-  static countOperation(
+  /// Executes the given function over the current delimiters
+  /// giving the ability to count the number of occurrences
+  /// of the opening or closing delimiters.
+  /// 
+  /// This method could be used to have total control
+  /// over how matching delimiters are calculated.
+  /// By using the 'openingCount' and 'closingCount'
+  /// parameters with some conditional logic you can
+  /// decide what defines delimiters to match and what
+  /// doesn't.
+  // TODO: write examples
+  static countOperation(  // TODO: make it void and used with .of() method
       Delimiters delimiters,
       Function(
         Delimiters delimiters,
         int openingCount,
         int closingCount,
       ) f) {
-    int openingCount = 1;
+    int openingCount = 1; // TODO: openingCount should be initialized to 0
     int closingCount = 0;
     f(delimiters, openingCount, closingCount);
   }
@@ -117,9 +160,4 @@ class AllMatchesIndexes {
     }
     return _result;
   }
-}
-
-void main() {
-  print("delimiters of --> ${Delimiters.of("A")}");
-  print("delimiters of --> ${Delimiters.of("()")}");
 }
