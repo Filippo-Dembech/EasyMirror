@@ -25,9 +25,8 @@ class MethodAnalyzer {
     // ! time slows execution down
     // ! withoutWhiteSpaces() because it makes it easier to use string patterns throughout
     // ! the entire codebase without the worry to consider them.
-    _parametersDeclarationWithoutSpaces =
-        _extractParametersDeclarationFrom(source);
-    print("source: $source"); // * DEBUG
+    _parametersDeclarationWithoutSpaces = _extractParametersDeclarationFrom(source);
+    // print("source: $source"); // * DEBUG
   }
 
   String _extractParametersDeclarationFrom(String source) {
@@ -47,6 +46,82 @@ class MethodAnalyzer {
 
   String get parametersReport => ParametersReporter().reports(this.parameters);
 
+  List<Parameter> get parameters {
+    List<Parameter> result = [];
+    for (String parameter in parametersDeclarations) {
+      // print("parameter: $parameter"); //* DEBUG
+      String parameterType = parameter.split("::")[0];
+      String parameterDeclaration = parameter.split("::")[1];
+      String parameterDataType = parameterDeclaration.split(" ")[0];
+      String parameterName = parameterDeclaration.split(" ")[1];
+      String? defaultValue;
+      int equalSignIndex = parameter.indexOf("=");
+      if (_thereIsEqualSignIn(parameter)) {
+        defaultValue = parameter
+          .substring(equalSignIndex + 2)
+          .replaceAll("\"", "");  // ! replaceAll() because the 'source' returned by the method mirror keeps quotes "" as characters
+      }
+      bool isRequired = false;
+      bool hasDefaultValue = false;
+      bool isNamed = false;
+      bool isOptionalPositional = false;
+      bool isPositional = false;
+      bool isNullable = false;
+      ParameterType type = ParameterType.positional;
+
+      // isRequired
+      if (parameterDataType == "required") {
+        isRequired = true;
+        parameterDataType = parameterDeclaration.split(" ")[1];
+        parameterName = parameterDeclaration.split(" ")[2];
+      }
+
+      if (parameterType == "Positional") isRequired = true;
+
+      if (_thereIsEqualSignIn(parameter)) hasDefaultValue = true;
+      if (parameter.startsWith("Named")) {
+        isNamed = true;
+        type = ParameterType.named;
+      }
+      if (parameter.startsWith("OptionalPositional")) {
+        isOptionalPositional = true;
+        type = ParameterType.optionalPositional;
+      }
+      if (parameter.startsWith("Positional")) {
+        isPositional = true;
+        type = ParameterType.positional;
+      }
+      if (parameterDataType.endsWith("?")) isNullable = true;
+
+      result.add(
+        Parameter(
+          dataType: parameterDataType,
+          name: parameterName,
+          type: type,
+          defaultValue: defaultValue,
+          isRequired: isRequired,
+          hasDefaultValue: hasDefaultValue,
+          isNamed: isNamed,
+          isOptionalPositional: isOptionalPositional,
+          isPositional: isPositional,
+          isNullable: isNullable,
+        ),
+      );
+    }
+    return result;
+  }
+
+  List<String> get parametersDeclarations => _parametersDeclarations();
+
+  List<String> _parametersDeclarations() {
+    List<String> result = [];
+    for (int i = 0; i < _parametersTexts.length; i++) {
+      result.add("${_parametersTexts[i].split("::")[0]}::${_parametersDataTypes()[i]} ${parametersNames[i]}${parametersDefaults[i]}");
+    }
+    return result;
+  }
+
+
   bool get hasParameters => method.parameters.isNotEmpty;
 
   bool get hasNamedParameters =>
@@ -65,34 +140,8 @@ class MethodAnalyzer {
 
   // =============================================
 
-  List<String> get _parametersTexts => [
-        ..._positionalParameters(),
-        ..._optionalPositionalParameters(),
-        ..._namedParameters(),
-      ].withoutEmptyStrings();
 
-  List<String> _positionalParameters() {
-    if (_thereAreNoParameters() ||
-        _thereAreOnlyOptionalPositionalParameters() ||
-        _thereAreOnlyNamedParameters()) return [];
 
-    int endingIndex = _findPositionalParametersEndingIndexInParametersDeclarationWithoutSpaces();
-
-    String parameters =
-        _parametersDeclarationWithoutSpaces.substring(0, endingIndex);
-    List<String> splitParameters = _splitParameters(parameters);
-    List<String> splitParametersWithoutEmptyString =
-        splitParameters.withoutEmptyStrings();
-    List<String> positionalParameters = splitParametersWithoutEmptyString
-        .map((parameter) => "Positional::$parameter")
-        .toList();
-
-    return positionalParameters;
-  }
-
-  bool _thereAreNoParameters() => _parametersDeclarationWithoutSpaces == "()";
-  bool _thereAreOnlyOptionalPositionalParameters() => _optionalPositionalParameters().length == parametersNames.length;
-  bool _thereAreOnlyNamedParameters() => _namedParameters().length == parametersNames.length;
 
   int _findPositionalParametersEndingIndexInParametersDeclarationWithoutSpaces() {
     int endingIndex = _parametersDeclarationWithoutSpaces.length;
@@ -108,15 +157,6 @@ class MethodAnalyzer {
   bool _optionalPositionalParametersStartAt(int i) => _parametersDeclarationWithoutSpaces.at(i) == "," && _parametersDeclarationWithoutSpaces.at(i + 1) == "[";
   bool _namedParametersStartAt(int i) => _parametersDeclarationWithoutSpaces.at(i) == "," && _parametersDeclarationWithoutSpaces.at(i + 1) == "{";
 
-  List<String> _optionalPositionalParameters() =>
-      _getParametersEnclosedIn(Delimiters.SQUARED_BRACKETS)
-          .map((parameter) => "OptionalPositional::$parameter")
-          .toList();
-
-  List<String> _namedParameters() =>
-      _getParametersEnclosedIn(Delimiters.CURLY_BRACKETS)
-          .map((parameter) => "Named::$parameter")
-          .toList();
 
   List<String> _getParametersEnclosedIn(Delimiters delimiters) {
     String parameters =
@@ -176,101 +216,75 @@ class MethodAnalyzer {
     return result;
   }
 
-  List<Parameter> get parameters {
-    List<Parameter> result = [];
-    for (String parameter in parametersDeclarations) {
-      String parameterType = parameter.split("::")[0];
-      String parameterDeclaration = parameter.split("::")[1];
-      String parameterDataType = parameterDeclaration.split(" ")[0];
-      String parameterName = parameterDeclaration.split(" ")[1];
-      String? defaultValue;
-      int equalSignIndex = parameter.indexOf("=");
-      if (_thereIsEqualSignIn(parameter))
-        defaultValue = " ${parameter.substring(equalSignIndex)}";
-      bool isRequired = false;
-      bool hasDefaultValue = false;
-      bool isNamed = false;
-      bool isOptionalPositional = false;
-      bool isPositional = false;
-      bool isNullable = false;
-      ParameterType type = ParameterType.positional;
-
-      // isRequired
-      if (parameterDataType == "required") {
-        isRequired = true;
-        parameterDataType = parameterDeclaration.split(" ")[1];
-        parameterName = parameterDeclaration.split(" ")[2];
-      }
-
-      if (parameterType == "Positional") isRequired = true;
-
-      if (_thereIsEqualSignIn(parameter)) hasDefaultValue = true;
-      if (parameter.startsWith("Named")) {
-        isNamed = true;
-        type = ParameterType.named;
-      }
-      if (parameter.startsWith("OptionalPositional")) {
-        isOptionalPositional = true;
-        isPositional = true;
-        type = ParameterType.optionalPositional;
-      }
-      if (parameter.startsWith("Positional")) {
-        isPositional = true;
-        type = ParameterType.positional;
-      }
-      if (parameterDataType.endsWith("?")) isNullable = true;
-
-      result.add(
-        Parameter(
-          dataType: parameterDataType,
-          name: parameterName,
-          type: type,
-          defaultValue: defaultValue,
-          isRequired: isRequired,
-          hasDefaultValue: hasDefaultValue,
-          isNamed: isNamed,
-          isOptionalPositional: isOptionalPositional,
-          isPositional: isPositional,
-          isNullable: isNullable,
-        ),
-      );
-    }
-    return result;
-  }
 
   bool _thereIsEqualSignIn(String parameter) => parameter.contains("=");
 
-  List<String> get parametersDeclarations => _parametersDeclarations();
-
-  List<String> _parametersDeclarations() {
-    List<String> result = [];
-    for (int i = 0; i < _parametersTexts.length; i++) {
-      result.add(
-          "${_parametersTexts[i].split("::")[0]}::${_parametersDataTypes()[i]} ${parametersNames[i]}${parametersDefaults[i]}");
-    }
-    return result;
-  }
 
   List<String> _parametersDataTypes() {
     List<String> result = [];
     for (int i = 0; i < _parametersTexts.length; i++) {
       String parameterText = _parametersTexts[i];
+      // print("parameter text: $parameterText"); // * DEBUG
       String parameterName = parametersNames[i];
-      String parameterPrecedingName = parameterText
+      String parameterDataType;
+      if (_thereIsEqualSignIn(parameterText)) {
+        String textBeforeEqualSign = parameterText.split("=")[0];
+        parameterDataType = parameterText
+          .substring(0, textBeforeEqualSign.length - parameterName.length)
+          .split("::")[1];
+      } else {
+        parameterDataType = parameterText
           .substring(0, parameterText.length - parameterName.length)
           .split("::")[1];
-      int indexOfEqual = parameterText.indexOf("=");
+      }
 
-      if (_thereIsEqualSignIn(parameterText))
-        parameterPrecedingName =
-            parameterText.substring(0, indexOfEqual - 1).split("::")[1];
+      // print("parameterDataType: $parameterDataType"); // * DEBUG
 
-      String parameterDataType = parameterPrecedingName;
-      if (parameterPrecedingName.startsWith("required"))
-        parameterDataType = "required ${parameterPrecedingName.substring(8)}";
+      if (parameterDataType.startsWith("required"))
+        parameterDataType = "required ${parameterDataType.substring(8)}";
 
       result.add(parameterDataType);
     }
     return result;
   }
+
+  List<String> get _parametersTexts => [
+        ..._positionalParameters(),
+        ..._optionalPositionalParameters(),
+        ..._namedParameters(),
+      ].withoutEmptyStrings();
+
+
+  List<String> _positionalParameters() {
+    if (_thereAreNoParameters() ||
+        _thereAreOnlyOptionalPositionalParameters() ||
+        _thereAreOnlyNamedParameters()) return [];
+
+    int endingIndex = _findPositionalParametersEndingIndexInParametersDeclarationWithoutSpaces();
+
+    String parameters =
+        _parametersDeclarationWithoutSpaces.substring(0, endingIndex);
+    List<String> splitParameters = _splitParameters(parameters);
+    List<String> splitParametersWithoutEmptyString =
+        splitParameters.withoutEmptyStrings();
+    List<String> positionalParameters = splitParametersWithoutEmptyString
+        .map((parameter) => "Positional::$parameter")
+        .toList();
+
+    return positionalParameters;
+  }
+
+  bool _thereAreNoParameters() => _parametersDeclarationWithoutSpaces == "";
+  bool _thereAreOnlyOptionalPositionalParameters() => _optionalPositionalParameters().length == parametersNames.length;
+  bool _thereAreOnlyNamedParameters() => _namedParameters().length == parametersNames.length;
+
+  List<String> _optionalPositionalParameters() =>
+      _getParametersEnclosedIn(Delimiters.SQUARED_BRACKETS)
+          .map((parameter) => "OptionalPositional::$parameter")
+          .toList();
+
+  List<String> _namedParameters() =>
+      _getParametersEnclosedIn(Delimiters.CURLY_BRACKETS)
+          .map((parameter) => "Named::$parameter")
+          .toList();
 }

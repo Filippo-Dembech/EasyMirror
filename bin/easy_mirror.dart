@@ -87,8 +87,7 @@ class Test {
   }
 
   // methods with positional parameters and optional positional parameters with generics
-  void p(int a, Generic<String, int, int> b,
-      [int? optionalC, Generic<String, int, int>? optionalD]) {
+  void p(int a, Generic<String, int, int> b, [int? optionalC, Generic<String, int, int>? optionalD]) {
     print("d");
   }
 
@@ -98,8 +97,7 @@ class Test {
   }
 
   // methods with positional parameters and named parameters with generics
-  void r(int a, Generic<String, int, int> b,
-      {int? namedC, Generic<String, int, int>? namedD}) {
+  void r(int a, Generic<String, int, int> b, {int? namedC, Generic<String, int, int>? namedD}) {
     print("f");
   }
 
@@ -108,21 +106,13 @@ class Test {
   // methods with positional parameters and returning value with generics
   Generic<String, int, int> t(Generic<String, int, int> a, int b) => Generic();
   // methods with optional positional parameters and returning value with generics
-  Generic<String, int, int> u(
-          [int? optionalA, Generic<String, int, int>? optionalB]) =>
-      Generic();
+  Generic<String, int, int> u([int? optionalA, Generic<String, int, int>? optionalB]) => Generic();
   // methods with positional parameters and optional positional parameters and returning value with generics
-  Generic<String, int, int> v(int a, Generic<String, int, int> b,
-          [int? optionalC, Generic<String, int, int>? optionalD]) =>
-      Generic();
+  Generic<String, int, int> v(int a, Generic<String, int, int> b, [int? optionalC, Generic<String, int, int>? optionalD]) => Generic();
   // methods with named parameters and returning value with generics
-  Generic<String, int, int> x(
-          {int? namedA, Generic<String, int, int>? namedD}) =>
-      Generic();
+  Generic<String, int, int> x({int? namedA, Generic<String, int, int>? namedD}) => Generic();
   // methods with positional parameters and named parameters and returning value with generics
-  Generic<String, int, int> y(int a, Generic<String, int, int> b,
-          {int? namedC, Generic<String, int, int>? namedD}) =>
-      Generic();
+  Generic<String, int, int> y(int a, Generic<String, int, int> b, {int? namedC, Generic<String, int, int>? namedD}) => Generic();
 
   // record parameters
   void z((String, int) a) {
@@ -140,8 +130,7 @@ class Test {
   (Generic<String, int, int>, int) C() => (Generic(), 1);
 
   void D(int a, int b, {int? c, required int d}) {}
-  void E(int a, Function(Generic<bool, int, int>) b,
-      {int? c, required Function(int, int) d}) {}
+  void E(int a, Function(Generic<bool, int, int>) b, {int? c, required Function(int, int) d}) {}
   void F({required int a, required int b, required int c}) {}
   void G({int a = 2}) {}
   void H([int a = 2, int b = 3, int? c]) {}
@@ -150,7 +139,10 @@ class Test {
   void I({List<String>? names = const []}) {}
 }
 
+// TODO: if the source code has new lines 'index: invalid value' error is returned
+
 void main() {
+
   final a = reflect(Test());
 
   a.type.declarations.forEach((symbol, declaration) {

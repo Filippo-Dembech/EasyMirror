@@ -1,3 +1,5 @@
+import 'package:easy_mirror/src/method_analyzer/extensions/string_whitespaces_remover.dart';
+
 import 'parameter_type.dart';
 
 class Parameter {
@@ -79,5 +81,18 @@ class Parameter {
     isNullable.hashCode;
 
   @override
-  String toString() => "(#${type.value}# ${(isNamed && isRequired) ? "required " : ""}$dataType $name${defaultValue ?? ""})";
+  String toString() {
+    print("parameter name: ${this.name}");
+    print("parameter datatype: ${this.dataType}");
+    String parameterType = type.value;
+    String requiredNamed = (isNamed && isRequired) ? "required " : "";
+    String dataType = this.dataType.withoutWhiteSpaces();
+    String name = this.name;
+    String defaultValue = "";
+    if (this.defaultValue != null) {
+      defaultValue = " = ${this.defaultValue!}";
+    }
+
+    return "(#${parameterType}# ${requiredNamed}${dataType} $name${defaultValue}\nisPositional=${this.isPositional},\nisOptionalPositional=${this.isOptionalPositional},\nisNamed=${this.isNamed},\nisOptional=${this.isOptional},\nisRequired=${this.isRequired},\nisNullable=${this.isNullable},\nhasDefaultValue=${this.hasDefaultValue},\ndefaultValue=${this.defaultValue})";
+  }
 }
