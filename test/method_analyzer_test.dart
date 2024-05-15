@@ -1,6 +1,5 @@
 import 'dart:mirrors';
 
-import 'package:collection/collection.dart';
 import 'package:easy_mirror/easy_mirror.dart';
 import 'package:easy_mirror/src/method_analyzer/parameter_type.dart';
 import 'package:test/test.dart';
