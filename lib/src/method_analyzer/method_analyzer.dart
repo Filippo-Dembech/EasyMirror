@@ -13,6 +13,7 @@ import 'temp/parameters_reporter.dart';
 
 class MethodAnalyzer {
   // TODO: make 'method' private
+  // TODO: if the source code has new lines 'index: invalid value' error is returned
   MethodMirror method;
   late String _parametersDeclarationWithoutSpaces;
   List<ParameterMirror> _parametersMirrors;
