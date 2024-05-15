@@ -28,6 +28,7 @@ class MethodAnalyzer {
     // ! withoutWhiteSpaces() because it makes it easier to use string patterns throughout
     // ! the entire codebase without the worry to consider them.
     _sourceParametersDeclaration = _extractParametersDeclarationFrom(source);
+    // print(_sourceParametersDeclaration); // * DEBUG
   }
 
   String _extractParametersDeclarationFrom(String source) {
@@ -151,38 +152,6 @@ class MethodAnalyzer {
 
   // TODO: replace _splitParameters() method with StringSplitter
 // ! parameters list must be without opening "(" and closing ")"
-  List<String> _splitParameters(String text) {
-    List<String> result = [];
-
-    int openingParenthesis = 0;
-    int closingParenthesis = 0;
-
-    int openingAngleBrackets = 0;
-    int closingAngleBrackets = 0;
-
-    int splitStart = 0;
-
-    for (int i = 0; i < text.length; i++) {
-      if (text.at(i).isEqualTo("(")) openingParenthesis++;
-      if (text.at(i).isEqualTo(")")) closingParenthesis++;
-
-      if (text.at(i).isEqualTo("<")) openingAngleBrackets++;
-      if (text.at(i).isEqualTo(">")) closingAngleBrackets++;
-
-      if (text.at(i).isEqualTo(",") &&
-          openingAngleBrackets.isEqualTo(closingAngleBrackets) &&
-          openingParenthesis.isEqualTo(closingParenthesis)) {
-        String substring = text.substring(splitStart, i);
-        result.add(substring);
-        splitStart = i + 1;
-      }
-    }
-
-    // ? add the last trailing parameter
-    result.add(text.substring(splitStart));
-
-    return result;
-  }
 
   List<String> get parametersDefaults => _parametersDefaults();
 
@@ -275,6 +244,39 @@ class MethodAnalyzer {
   bool _namedParametersStartAt(int i) =>
     _sourceParametersDeclaration.at(i) == "," &&
     _sourceParametersDeclaration.at(i + 1) == "{";
+
+  List<String> _splitParameters(String text) {
+    List<String> result = [];
+
+    int openingParenthesis = 0;
+    int closingParenthesis = 0;
+
+    int openingAngleBrackets = 0;
+    int closingAngleBrackets = 0;
+
+    int splitStart = 0;
+
+    for (int i = 0; i < text.length; i++) {
+      if (text.at(i).isEqualTo("(")) openingParenthesis++;
+      if (text.at(i).isEqualTo(")")) closingParenthesis++;
+
+      if (text.at(i).isEqualTo("<")) openingAngleBrackets++;
+      if (text.at(i).isEqualTo(">")) closingAngleBrackets++;
+
+      if (text.at(i).isEqualTo(",") &&
+          openingAngleBrackets.isEqualTo(closingAngleBrackets) &&
+          openingParenthesis.isEqualTo(closingParenthesis)) {
+        String substring = text.substring(splitStart, i);
+        result.add(substring);
+        splitStart = i + 1;
+      }
+    }
+
+    // ? add the last trailing parameter
+    result.add(text.substring(splitStart));
+
+    return result;
+  }
 
   List<String> _optionalPositionalParameters() =>
       _getParametersEnclosedIn(Delimiters.SQUARED_BRACKETS)

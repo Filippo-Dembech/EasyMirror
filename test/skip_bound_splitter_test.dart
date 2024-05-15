@@ -1,5 +1,5 @@
 import 'package:easy_mirror/easy_mirror.dart';
-import 'package:easy_mirror/src/method_analyzer/string_splitter/skip_bound_splitter.dart';
+import 'package:easy_mirror/src/method_analyzer/skip_bound_splitter/skip_bound_splitter.dart';
 import 'package:test/test.dart';
 
 void main() {

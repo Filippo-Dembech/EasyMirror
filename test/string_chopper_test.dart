@@ -1,4 +1,4 @@
-import 'package:easy_mirror/src/method_analyzer/string_splitter/string_chopper.dart';
+import 'package:easy_mirror/src/method_analyzer/skip_bound_splitter/string_chopper.dart';
 import 'package:test/test.dart';
 
 void main() {
