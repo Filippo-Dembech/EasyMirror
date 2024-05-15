@@ -15,7 +15,8 @@ class MethodAnalyzer {
   // TODO: make 'method' private
   // TODO: if the source code has new lines 'index: invalid value' error is returned
   MethodMirror method;
-  late String _parametersDeclarationWithoutSpaces;
+  /// 
+  late String _sourceParametersDeclaration;
   List<ParameterMirror> _parametersMirrors;
 
   MethodAnalyzer(this.method) : _parametersMirrors = method.parameters {
@@ -26,17 +27,17 @@ class MethodAnalyzer {
     // ! time slows execution down
     // ! withoutWhiteSpaces() because it makes it easier to use string patterns throughout
     // ! the entire codebase without the worry to consider them.
-    _parametersDeclarationWithoutSpaces = _extractParametersDeclarationFrom(source);
-    // print("source: $source"); // * DEBUG
+    _sourceParametersDeclaration = _extractParametersDeclarationFrom(source);
   }
 
   String _extractParametersDeclarationFrom(String source) {
     int methodNameIndex = source.indexOf(methodName + "(");
     String leftTrimSource =
         source.substring(methodNameIndex + methodName.length);
-    return StringExtractor.parsing(leftTrimSource)
-        .extractsFirstStringWithin(Delimiters.ROUND_BRACKETS)
-        .withoutWhiteSpaces();
+    return StringExtractor
+            .parsing(leftTrimSource)
+            .extractsFirstStringWithin(Delimiters.ROUND_BRACKETS)
+            .withoutWhiteSpaces();
   }
 
   String get methodName => MirrorSystem.getName(method.simpleName);
@@ -141,27 +142,9 @@ class MethodAnalyzer {
 
   // =============================================
 
-
-
-
-  int _findPositionalParametersEndingIndexInParametersDeclarationWithoutSpaces() {
-    int endingIndex = _parametersDeclarationWithoutSpaces.length;
-    for (int i = 0; i < endingIndex - 1; i++) {
-      if (_optionalPositionalParametersStartAt(i) ||
-          _namedParametersStartAt(i)) {
-        endingIndex = i;
-      }
-    }
-    return endingIndex;
-  }
-
-  bool _optionalPositionalParametersStartAt(int i) => _parametersDeclarationWithoutSpaces.at(i) == "," && _parametersDeclarationWithoutSpaces.at(i + 1) == "[";
-  bool _namedParametersStartAt(int i) => _parametersDeclarationWithoutSpaces.at(i) == "," && _parametersDeclarationWithoutSpaces.at(i + 1) == "{";
-
-
   List<String> _getParametersEnclosedIn(Delimiters delimiters) {
     String parameters =
-        StringExtractor.parsing(_parametersDeclarationWithoutSpaces)
+        StringExtractor.parsing(_sourceParametersDeclaration)
             .extractsFirstStringWithin(delimiters);
     return _splitParameters(parameters).withoutEmptyStrings();
   }
@@ -261,23 +244,37 @@ class MethodAnalyzer {
         _thereAreOnlyOptionalPositionalParameters() ||
         _thereAreOnlyNamedParameters()) return [];
 
-    int endingIndex = _findPositionalParametersEndingIndexInParametersDeclarationWithoutSpaces();
+    int endingIndex = _getPositionalParametersEndingIndex();
 
-    String parameters =
-        _parametersDeclarationWithoutSpaces.substring(0, endingIndex);
-    List<String> splitParameters = _splitParameters(parameters);
-    List<String> splitParametersWithoutEmptyString =
-        splitParameters.withoutEmptyStrings();
-    List<String> positionalParameters = splitParametersWithoutEmptyString
+    String parameters = _sourceParametersDeclaration.substring(0, endingIndex);
+    List<String> splitParameters = _splitParameters(parameters).withoutEmptyStrings();
+    return splitParameters
         .map((parameter) => "Positional::$parameter")
         .toList();
-
-    return positionalParameters;
   }
 
-  bool _thereAreNoParameters() => _parametersDeclarationWithoutSpaces == "";
+  bool _thereAreNoParameters() => _sourceParametersDeclaration.isEmpty;
   bool _thereAreOnlyOptionalPositionalParameters() => _optionalPositionalParameters().length == parametersNames.length;
   bool _thereAreOnlyNamedParameters() => _namedParameters().length == parametersNames.length;
+
+  int _getPositionalParametersEndingIndex() {
+    int endingIndex = _sourceParametersDeclaration.length;
+    for (int i = 0; i < endingIndex - 1; i++) {
+      if (_optionalPositionalParametersStartAt(i) ||
+          _namedParametersStartAt(i)) {
+        endingIndex = i;
+      }
+    }
+    return endingIndex;
+  }
+
+  bool _optionalPositionalParametersStartAt(int i) =>
+    _sourceParametersDeclaration.at(i) == "," &&
+    _sourceParametersDeclaration.at(i + 1) == "[";
+
+  bool _namedParametersStartAt(int i) =>
+    _sourceParametersDeclaration.at(i) == "," &&
+    _sourceParametersDeclaration.at(i + 1) == "{";
 
   List<String> _optionalPositionalParameters() =>
       _getParametersEnclosedIn(Delimiters.SQUARED_BRACKETS)
