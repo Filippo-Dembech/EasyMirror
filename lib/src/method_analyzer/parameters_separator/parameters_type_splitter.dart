@@ -5,6 +5,7 @@ import 'package:easy_mirror/src/method_analyzer/extensions/string__element_fetch
 import 'package:easy_mirror/src/method_analyzer/extensions/string_whitespaces_remover.dart';
 
 class ParametersTypeSplitter {
+  // TODO: if method returns record the extractor extracts that instead of the method body
   late String _parametersDeclaration;
 
   List<Map<String, dynamic>> separates(String parametersDeclaration) {
@@ -18,7 +19,7 @@ class ParametersTypeSplitter {
         ..._positionalParameters(),
         ..._optionalPositionalParameters(),
         ..._namedParameters(),
-      ];
+  ];
 
 
   List<Map<String, dynamic>> _positionalParameters() {

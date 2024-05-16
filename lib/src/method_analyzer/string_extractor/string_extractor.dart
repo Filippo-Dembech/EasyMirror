@@ -1,4 +1,3 @@
-import 'package:easy_mirror/src/method_analyzer/extensions/list__empty_string_remover.dart';
 import 'delimiters.dart';
 
 /// Extracts substring delimited by defined delimiters
@@ -88,7 +87,7 @@ final class PluckExtraction extends Extraction {
     for (var indexes in Delimiters.allMatchesIndexes(delimiters, string)) {
       result.add(string.substring(indexes.$1 + 1, indexes.$2));
     };
-    return result.withoutEmptyStrings();
+    return result;
   }
 
 
@@ -118,7 +117,7 @@ final class ViseExtraction extends Extraction {
 
     if (firstOpeningDelimiterIndex != -1 && lastClosingDelimiterIndex != -1)
       return [string.substring(
-          firstOpeningDelimiterIndex, lastClosingDelimiterIndex)].withoutEmptyStrings();
+          firstOpeningDelimiterIndex, lastClosingDelimiterIndex)];
     else
       return [];
   }
