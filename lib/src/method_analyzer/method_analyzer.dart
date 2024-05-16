@@ -14,6 +14,7 @@ import 'temp/parameters_reporter.dart';
 class MethodAnalyzer {
   // TODO: make 'method' private
   // TODO: if the source code has new lines 'index: invalid value' error is returned
+  // TODO: remove all the '.withoutEmptyStrings()'
   MethodMirror method;
   /// 
   late String _sourceParametersDeclaration;
@@ -143,12 +144,6 @@ class MethodAnalyzer {
 
   // =============================================
 
-  List<String> _getParametersEnclosedIn(Delimiters delimiters) {
-    String parameters =
-        StringExtractor.parsing(_sourceParametersDeclaration)
-            .extractsFirstStringWithin(delimiters);
-    return _splitParameters(parameters).withoutEmptyStrings();
-  }
 
   // TODO: replace _splitParameters() method with StringSplitter
 // ! parameters list must be without opening "(" and closing ")"
@@ -287,4 +282,11 @@ class MethodAnalyzer {
       _getParametersEnclosedIn(Delimiters.CURLY_BRACKETS)
           .map((parameter) => "Named::$parameter")
           .toList();
+
+  List<String> _getParametersEnclosedIn(Delimiters delimiters) {
+    String parameters =
+        StringExtractor.parsing(_sourceParametersDeclaration)
+            .extractsFirstStringWithin(delimiters);
+    return _splitParameters(parameters).withoutEmptyStrings();
+  }
 }

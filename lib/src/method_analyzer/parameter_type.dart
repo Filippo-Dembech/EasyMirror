@@ -2,8 +2,7 @@ enum ParameterType {
 
   positional("POSITIONAL"),
   optionalPositional("OPTIONAL_POSITIONAL"),
-  named("NAMED"),
-  optionalNamed("OPTIONAL_NAMED");
+  named("NAMED");
 
   final String value;
 
